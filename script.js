@@ -137,7 +137,7 @@ document.getElementById('recipe-image').addEventListener('change', function () {
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
 document.getElementById('cancel-recipe').addEventListener('click', () => {
     document.getElementById('add-recipe-overlay').style.display = 'none';
-    resetImageInput();
+    resetForm();
 });
 
 // Schließe Modal bei Klick auf Overlay
@@ -189,16 +189,20 @@ async function saveRecipe() {
     }
     displayRecipes(filteredRecipes);
     document.getElementById('add-recipe-overlay').style.display = 'none';
-    resetImageInput();
+    resetForm();
     // In Realität würde man das in data.json speichern, aber für Demo reicht das.
 }
 
-function resetImageInput() {
+function resetForm() {
     selectedImageDataUrl = '';
-    document.getElementById('recipe-image').value = '';
+    document.getElementById('add-recipe-form').reset();
     const preview = document.getElementById('recipe-image-preview');
     preview.src = '';
     preview.style.display = 'none';
 }
+
+// Sicherstellen dass Overlay und Formular beim Start sauber sind
+document.getElementById('add-recipe-overlay').style.display = 'none';
+resetForm();
 
 loadRecipes();
