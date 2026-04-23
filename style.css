@@ -78,6 +78,12 @@ header {
         width: 100%;
         margin-left: 0;
         border-radius: 10px;
+        margin-bottom: 10px;
+    }
+    #trash-btn {
+        width: 100%;
+        border-radius: 10px;
+        margin-bottom: 10px;
     }
     .recipe-grid {
         grid-template-columns: 1fr;
