@@ -1,9 +1,73 @@
 let recipes = [];
 let filteredRecipes = [];
+let trash = [];
 let selectedImageDataUrl = '';
+
+const TRASH_TTL = 5 * 24 * 60 * 60 * 1000;
 
 function saveToLocalStorage() {
     localStorage.setItem('smillas-recipes', JSON.stringify(recipes));
+}
+
+function saveTrash() {
+    localStorage.setItem('smillas-trash', JSON.stringify(trash));
+    try { db.ref('trash').set(trash).catch(() => {}); } catch(e) {}
+}
+
+function cleanupTrash() {
+    const before = trash.length;
+    trash = trash.filter(r => Date.now() - r.deletedAt < TRASH_TTL);
+    if (trash.length !== before) saveTrash();
+}
+
+function deleteRecipe(recipe) {
+    recipes = recipes.filter(r => r.id !== recipe.id);
+    filteredRecipes = filteredRecipes.filter(r => r.id !== recipe.id);
+    trash.push({ ...recipe, deletedAt: Date.now() });
+    saveToLocalStorage();
+    saveTrash();
+    try { db.ref('recipes').set(recipes).catch(() => {}); } catch(e) {}
+    displayRecipes(filteredRecipes);
+}
+
+function restoreRecipe(recipe) {
+    trash = trash.filter(r => r.id !== recipe.id);
+    const { deletedAt, ...clean } = recipe;
+    recipes.push(clean);
+    filteredRecipes = [...recipes];
+    saveToLocalStorage();
+    saveTrash();
+    try { db.ref('recipes').set(recipes).catch(() => {}); } catch(e) {}
+    displayRecipes(filteredRecipes);
+    displayTrash();
+}
+
+function displayTrash() {
+    const container = document.getElementById('trash-list');
+    container.innerHTML = '';
+    if (trash.length === 0) {
+        container.innerHTML = '<p class="trash-empty">Der Papierkorb ist leer.</p>';
+    } else {
+        trash.forEach(recipe => {
+            const daysLeft = Math.ceil((TRASH_TTL - (Date.now() - recipe.deletedAt)) / (24 * 60 * 60 * 1000));
+            const item = document.createElement('div');
+            item.className = 'trash-item';
+            item.innerHTML = `
+                ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="trash-no-img">🍽</div>'}
+                <div class="trash-item-info">
+                    <span class="trash-item-name">${recipe.name}</span>
+                    <span class="trash-item-days">Noch ${daysLeft} Tag${daysLeft !== 1 ? 'e' : ''}</span>
+                </div>
+                <button class="restore-btn">Wiederherstellen</button>
+            `;
+            item.querySelector('.restore-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                restoreRecipe(recipe);
+            });
+            container.appendChild(item);
+        });
+    }
+    document.getElementById('trash-overlay').style.display = 'flex';
 }
 
 function loadFromLocalStorage() {
@@ -44,6 +108,23 @@ async function loadRecipes() {
             saveToLocalStorage();
         }
     }
+    // Papierkorb laden
+    try {
+        const tsnap = await Promise.race([
+            db.ref('trash').get(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        ]);
+        if (tsnap.exists()) {
+            const val = tsnap.val();
+            trash = Array.isArray(val) ? val.filter(r => r !== null) : Object.values(val);
+        } else {
+            trash = JSON.parse(localStorage.getItem('smillas-trash') || '[]');
+        }
+    } catch(e) {
+        trash = JSON.parse(localStorage.getItem('smillas-trash') || '[]');
+    }
+    cleanupTrash();
+
     filteredRecipes = [...recipes];
     displayRecipes(filteredRecipes);
 }
@@ -56,8 +137,15 @@ function displayRecipes(recipesToDisplay) {
         card.className = 'recipe-card';
         card.innerHTML = `
             ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="card-no-image">🍽</div>'}
-            <h3>${recipe.name}</h3>
+            <div class="card-bottom">
+                <h3>${recipe.name}</h3>
+                <button class="delete-btn" title="In Papierkorb">🗑</button>
+            </div>
         `;
+        card.querySelector('.delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteRecipe(recipe);
+        });
         card.addEventListener('click', () => showRecipeDetail(recipe));
         container.appendChild(card);
     });
@@ -143,6 +231,14 @@ function applyFilters() {
 
 document.getElementById('add-recipe-btn').addEventListener('click', () => {
     document.getElementById('add-recipe-overlay').style.display = 'flex';
+});
+
+document.getElementById('trash-btn').addEventListener('click', displayTrash);
+document.getElementById('close-trash').addEventListener('click', () => {
+    document.getElementById('trash-overlay').style.display = 'none';
+});
+document.getElementById('trash-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'trash-overlay') document.getElementById('trash-overlay').style.display = 'none';
 });
 
 document.getElementById('recipe-image').addEventListener('change', function () {
