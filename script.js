@@ -46,7 +46,7 @@ function displayTrash() {
     const container = document.getElementById('trash-list');
     container.innerHTML = '';
     if (trash.length === 0) {
-        container.innerHTML = '<p class="trash-empty">Keine Fails bisher.</p>';
+        container.innerHTML = '<p class="trash-empty">Papierkorb ist leer.</p>';
     } else {
         trash.forEach(recipe => {
             const daysLeft = Math.ceil((TRASH_TTL - (Date.now() - recipe.deletedAt)) / (24 * 60 * 60 * 1000));
