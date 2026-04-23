@@ -280,6 +280,8 @@ const allFoodEmojis = [
     '☕','🫖','🧃','🥤','🧋','🍵','🍶','🧊',
 ];
 
+let emojiMode = 'ai';
+
 function buildEmojiPicker() {
     const picker = document.getElementById('emoji-picker');
     picker.innerHTML = '';
@@ -290,23 +292,63 @@ function buildEmojiPicker() {
         btn.textContent = emoji;
         btn.addEventListener('click', (e) => {
             e.preventDefault();
-            clearEmojiSelection();
+            selectEmoji(emoji);
+            document.querySelectorAll('#emoji-picker .emoji-option').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            selectedImageDataUrl = emoji;
-            document.getElementById('recipe-image').value = '';
-            document.getElementById('recipe-image-preview').style.display = 'none';
         });
         picker.appendChild(btn);
     });
 }
 buildEmojiPicker();
 
-document.getElementById('emoji-toggle').addEventListener('click', (e) => {
-    e.preventDefault();
-    const wrapper = document.getElementById('emoji-picker-wrapper');
-    const arrow = document.getElementById('emoji-arrow');
-    const open = wrapper.classList.toggle('open');
-    arrow.textContent = open ? '▴' : '▾';
+function selectEmoji(emoji) {
+    selectedImageDataUrl = emoji;
+    document.getElementById('recipe-image').value = '';
+    document.getElementById('recipe-image-preview').style.display = 'none';
+}
+
+function updateAIView(name) {
+    const view = document.getElementById('emoji-ai-view');
+    const suggestions = suggestEmojis(name);
+    if (!name || suggestions.length === 0) {
+        view.innerHTML = '<p class="emoji-hint">Namen eingeben für Vorschläge</p>';
+        return;
+    }
+    const top3 = suggestions.slice(0, 3);
+    view.innerHTML = '';
+    top3.forEach((emoji, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'emoji-ai-btn' + (i === 0 ? ' selected' : '');
+        btn.textContent = emoji;
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.emoji-ai-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectEmoji(emoji);
+        });
+        view.appendChild(btn);
+    });
+    if (selectedImageDataUrl === '' || Object.keys(emojiKeywords).includes(selectedImageDataUrl) || allFoodEmojis.includes(selectedImageDataUrl)) {
+        selectEmoji(top3[0]);
+    }
+}
+
+document.getElementById('mode-ai').addEventListener('click', () => {
+    emojiMode = 'ai';
+    document.getElementById('mode-ai').classList.add('active');
+    document.getElementById('mode-manual').classList.remove('active');
+    document.getElementById('emoji-ai-view').style.display = '';
+    document.getElementById('emoji-manual-view').style.display = 'none';
+    updateAIView(document.getElementById('recipe-name').value);
+});
+
+document.getElementById('mode-manual').addEventListener('click', () => {
+    emojiMode = 'manual';
+    document.getElementById('mode-manual').classList.add('active');
+    document.getElementById('mode-ai').classList.remove('active');
+    document.getElementById('emoji-ai-view').style.display = 'none';
+    document.getElementById('emoji-manual-view').style.display = '';
 });
 
 document.getElementById('recipe-image').addEventListener('change', function () {
@@ -382,32 +424,8 @@ function suggestEmojis(name) {
 }
 
 document.getElementById('recipe-name').addEventListener('input', function () {
-    if (selectedImageDataUrl && !Object.keys(emojiKeywords).includes(selectedImageDataUrl)) return;
-    const suggestions = suggestEmojis(this.value);
-    highlightSuggestedEmojis(suggestions);
-    if (suggestions.length > 0) {
-        clearEmojiSelection();
-        const btn = [...document.querySelectorAll('.emoji-option')]
-            .find(b => b.textContent === suggestions[0]);
-        if (btn) {
-            btn.classList.add('selected');
-            selectedImageDataUrl = suggestions[0];
-        }
-    }
+    if (emojiMode === 'ai') updateAIView(this.value);
 });
-
-function highlightSuggestedEmojis(suggestions) {
-    document.querySelectorAll('.emoji-option').forEach(btn => {
-        btn.classList.toggle('suggested', suggestions.includes(btn.textContent));
-    });
-    if (suggestions.length > 0) {
-        const wrapper = document.getElementById('emoji-picker-wrapper');
-        if (!wrapper.classList.contains('open')) {
-            wrapper.classList.add('open');
-            document.getElementById('emoji-arrow').textContent = '▴';
-        }
-    }
-}
 
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
 document.getElementById('cancel-recipe').addEventListener('click', () => {
@@ -485,10 +503,12 @@ function resetForm() {
     document.getElementById('recipe-tags').value = '';
     document.querySelectorAll('.meal-checkbox').forEach(cb => cb.checked = false);
     clearEmojiSelection();
-    document.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('suggested'));
-    const wrapper = document.getElementById('emoji-picker-wrapper');
-    wrapper.classList.remove('open');
-    document.getElementById('emoji-arrow').textContent = '▾';
+    emojiMode = 'ai';
+    document.getElementById('mode-ai').classList.add('active');
+    document.getElementById('mode-manual').classList.remove('active');
+    document.getElementById('emoji-ai-view').style.display = '';
+    document.getElementById('emoji-manual-view').style.display = 'none';
+    document.getElementById('emoji-ai-view').innerHTML = '<p class="emoji-hint">Namen eingeben für Vorschläge</p>';
     const preview = document.getElementById('recipe-image-preview');
     preview.src = '';
     preview.style.display = 'none';

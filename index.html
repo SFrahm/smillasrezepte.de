@@ -95,9 +95,17 @@
                 <label for="recipe-image">Bild</label>
                 <input type="file" id="recipe-image" accept="image/*">
                 <img id="recipe-image-preview" alt="Vorschau">
-                <button type="button" id="emoji-toggle">Emoji wählen <span id="emoji-arrow">▾</span></button>
-                <div id="emoji-picker-wrapper">
-                    <div id="emoji-picker"></div>
+                <div id="emoji-section">
+                    <div class="emoji-mode-toggle">
+                        <button type="button" class="mode-btn active" id="mode-ai">KI-Vorschlag</button>
+                        <button type="button" class="mode-btn" id="mode-manual">Selbst wählen</button>
+                    </div>
+                    <div id="emoji-ai-view">
+                        <p class="emoji-hint">Namen eingeben für Vorschläge</p>
+                    </div>
+                    <div id="emoji-manual-view" style="display:none">
+                        <div id="emoji-picker"></div>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
