@@ -104,7 +104,7 @@ function applyFilters() {
 }
 
 document.getElementById('add-recipe-btn').addEventListener('click', () => {
-    document.getElementById('add-recipe-overlay').style.display = 'block';
+    document.getElementById('add-recipe-overlay').style.display = 'flex';
 });
 
 document.getElementById('recipe-image').addEventListener('change', function () {
