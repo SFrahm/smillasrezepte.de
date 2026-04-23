@@ -95,28 +95,9 @@
                 <label for="recipe-image">Bild</label>
                 <input type="file" id="recipe-image" accept="image/*">
                 <img id="recipe-image-preview" alt="Vorschau">
-                <p class="emoji-label">Oder Emoji wählen:</p>
-                <div id="emoji-picker">
-                    <button class="emoji-option">🍕</button>
-                    <button class="emoji-option">🍔</button>
-                    <button class="emoji-option">🍣</button>
-                    <button class="emoji-option">🥗</button>
-                    <button class="emoji-option">🍜</button>
-                    <button class="emoji-option">🍰</button>
-                    <button class="emoji-option">🥘</button>
-                    <button class="emoji-option">🍳</button>
-                    <button class="emoji-option">🥩</button>
-                    <button class="emoji-option">🌮</button>
-                    <button class="emoji-option">🍲</button>
-                    <button class="emoji-option">🥧</button>
-                    <button class="emoji-option">🍩</button>
-                    <button class="emoji-option">🧁</button>
-                    <button class="emoji-option">🥐</button>
-                    <button class="emoji-option">🍱</button>
-                    <button class="emoji-option">🥙</button>
-                    <button class="emoji-option">🍪</button>
-                    <button class="emoji-option">🥚</button>
-                    <button class="emoji-option">🫕</button>
+                <button type="button" id="emoji-toggle">Emoji wählen <span id="emoji-arrow">▾</span></button>
+                <div id="emoji-picker-wrapper">
+                    <div id="emoji-picker"></div>
                 </div>
             </div>
             <div class="form-group">

@@ -270,6 +270,45 @@ document.getElementById('trash-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'trash-overlay') document.getElementById('trash-overlay').style.display = 'none';
 });
 
+const allFoodEmojis = [
+    '🍕','🍔','🍟','🌭','🥪','🌮','🌯','🥙','🧆','🥚','🍳','🧇','🥞','🧈',
+    '🍞','🥐','🥖','🫓','🥨','🧀','🥗','🥘','🫕','🍲','🍛','🍜','🍝','🍠',
+    '🍱','🍣','🍤','🍙','🍚','🍘','🥟','🥡','🦐','🐟','🥩','🍗','🥓',
+    '🍰','🎂','🧁','🍩','🍪','🍫','🍮','🥧','🍦','🍧','🍨','🍬','🍭',
+    '🥑','🥦','🥕','🌽','🍅','🧄','🧅','🥔','🫘','🍄','🥜','🫛',
+    '🍇','🍓','🫐','🍒','🍑','🥭','🍍','🍌','🍋','🍊','🍎','🍐','🥝','🍉',
+    '☕','🫖','🧃','🥤','🧋','🍵','🍶','🧊',
+];
+
+function buildEmojiPicker() {
+    const picker = document.getElementById('emoji-picker');
+    picker.innerHTML = '';
+    allFoodEmojis.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'emoji-option';
+        btn.textContent = emoji;
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            clearEmojiSelection();
+            btn.classList.add('selected');
+            selectedImageDataUrl = emoji;
+            document.getElementById('recipe-image').value = '';
+            document.getElementById('recipe-image-preview').style.display = 'none';
+        });
+        picker.appendChild(btn);
+    });
+}
+buildEmojiPicker();
+
+document.getElementById('emoji-toggle').addEventListener('click', (e) => {
+    e.preventDefault();
+    const wrapper = document.getElementById('emoji-picker-wrapper');
+    const arrow = document.getElementById('emoji-arrow');
+    const open = wrapper.classList.toggle('open');
+    arrow.textContent = open ? '▴' : '▾';
+});
+
 document.getElementById('recipe-image').addEventListener('change', function () {
     const file = this.files[0];
     if (!file) return;
@@ -284,16 +323,6 @@ document.getElementById('recipe-image').addEventListener('change', function () {
     reader.readAsDataURL(file);
 });
 
-document.querySelectorAll('.emoji-option').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        clearEmojiSelection();
-        btn.classList.add('selected');
-        selectedImageDataUrl = btn.textContent;
-        document.getElementById('recipe-image').value = '';
-        document.getElementById('recipe-image-preview').style.display = 'none';
-    });
-});
 
 function clearEmojiSelection() {
     document.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('selected'));
@@ -371,6 +400,13 @@ function highlightSuggestedEmojis(suggestions) {
     document.querySelectorAll('.emoji-option').forEach(btn => {
         btn.classList.toggle('suggested', suggestions.includes(btn.textContent));
     });
+    if (suggestions.length > 0) {
+        const wrapper = document.getElementById('emoji-picker-wrapper');
+        if (!wrapper.classList.contains('open')) {
+            wrapper.classList.add('open');
+            document.getElementById('emoji-arrow').textContent = '▴';
+        }
+    }
 }
 
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
@@ -450,6 +486,9 @@ function resetForm() {
     document.querySelectorAll('.meal-checkbox').forEach(cb => cb.checked = false);
     clearEmojiSelection();
     document.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('suggested'));
+    const wrapper = document.getElementById('emoji-picker-wrapper');
+    wrapper.classList.remove('open');
+    document.getElementById('emoji-arrow').textContent = '▾';
     const preview = document.getElementById('recipe-image-preview');
     preview.src = '';
     preview.style.display = 'none';
