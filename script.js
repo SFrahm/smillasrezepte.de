@@ -1,5 +1,6 @@
 let recipes = [];
 let filteredRecipes = [];
+let selectedImageDataUrl = '';
 
 async function loadRecipes() {
     const response = await fetch('data.json');
@@ -106,9 +107,23 @@ document.getElementById('add-recipe-btn').addEventListener('click', () => {
     document.getElementById('add-recipe-overlay').style.display = 'block';
 });
 
+document.getElementById('recipe-image').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        selectedImageDataUrl = e.target.result;
+        const preview = document.getElementById('recipe-image-preview');
+        preview.src = selectedImageDataUrl;
+        preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+});
+
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
 document.getElementById('cancel-recipe').addEventListener('click', () => {
     document.getElementById('add-recipe-overlay').style.display = 'none';
+    resetImageInput();
 });
 
 // Schließe Modal bei Klick auf Overlay
@@ -120,7 +135,7 @@ document.getElementById('add-recipe-overlay').addEventListener('click', (event) 
 
 function saveRecipe() {
     const name = document.getElementById('recipe-name').value;
-    const image = document.getElementById('recipe-image').value;
+    const image = selectedImageDataUrl;
     const description = document.getElementById('recipe-description').value;
     const ingredients = document.getElementById('recipe-ingredients').value.split(',');
     const instructions = document.getElementById('recipe-instructions').value;
@@ -155,7 +170,16 @@ function saveRecipe() {
     filteredRecipes = [...recipes];
     displayRecipes(filteredRecipes);
     document.getElementById('add-recipe-overlay').style.display = 'none';
+    resetImageInput();
     // In Realität würde man das in data.json speichern, aber für Demo reicht das.
+}
+
+function resetImageInput() {
+    selectedImageDataUrl = '';
+    document.getElementById('recipe-image').value = '';
+    const preview = document.getElementById('recipe-image-preview');
+    preview.src = '';
+    preview.style.display = 'none';
 }
 
 loadRecipes();

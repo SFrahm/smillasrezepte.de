@@ -80,8 +80,9 @@
                 <input type="text" id="recipe-name" required>
             </div>
             <div class="form-group">
-                <label for="recipe-image">Bild-URL *</label>
-                <input type="url" id="recipe-image" required>
+                <label for="recipe-image">Bild *</label>
+                <input type="file" id="recipe-image" accept="image/*">
+                <img id="recipe-image-preview" alt="Vorschau">
             </div>
             <div class="form-group">
                 <label for="recipe-description">Beschreibung *</label>
