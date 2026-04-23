@@ -143,6 +143,21 @@ async function loadRecipes() {
     displayRecipes(filteredRecipes);
 }
 
+function isUrl(str) {
+    return str && (str.startsWith('data:') || str.startsWith('http'));
+}
+
+function imgHtml(recipe, type) {
+    if (isUrl(recipe.image)) {
+        return type === 'card'
+            ? `<img src="${recipe.image}" alt="${recipe.name}">`
+            : `<img src="${recipe.image}" alt="${recipe.name}">`;
+    }
+    const emoji = recipe.image || '🍽';
+    const cls = type === 'card' ? 'card-no-image' : 'detail-no-image';
+    return `<div class="${cls}">${emoji}</div>`;
+}
+
 function displayRecipes(recipesToDisplay) {
     const container = document.getElementById('recipes-grid');
     container.innerHTML = '';
@@ -150,7 +165,7 @@ function displayRecipes(recipesToDisplay) {
         const card = document.createElement('div');
         card.className = 'recipe-card';
         card.innerHTML = `
-            ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="card-no-image">🍽</div>'}
+            ${imgHtml(recipe, 'card')}
             <div class="card-bottom">
                 <h3>${recipe.name}</h3>
                 <button class="delete-btn" title="Zu Fails">🗑</button>
@@ -168,7 +183,7 @@ function displayRecipes(recipesToDisplay) {
 function showRecipeDetail(recipe) {
     const content = document.getElementById('recipe-detail-content');
     content.innerHTML = `
-        ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="detail-no-image">🍽</div>'}
+        ${imgHtml(recipe, 'detail')}
         <h2>${recipe.name}</h2>
         <p class="detail-description">${recipe.description}</p>
         <div class="detail-meta">
@@ -258,6 +273,7 @@ document.getElementById('trash-overlay').addEventListener('click', (e) => {
 document.getElementById('recipe-image').addEventListener('change', function () {
     const file = this.files[0];
     if (!file) return;
+    clearEmojiSelection();
     const reader = new FileReader();
     reader.onload = function (e) {
         selectedImageDataUrl = e.target.result;
@@ -267,6 +283,21 @@ document.getElementById('recipe-image').addEventListener('change', function () {
     };
     reader.readAsDataURL(file);
 });
+
+document.querySelectorAll('.emoji-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        clearEmojiSelection();
+        btn.classList.add('selected');
+        selectedImageDataUrl = btn.textContent;
+        document.getElementById('recipe-image').value = '';
+        document.getElementById('recipe-image-preview').style.display = 'none';
+    });
+});
+
+function clearEmojiSelection() {
+    document.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('selected'));
+}
 
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
 document.getElementById('cancel-recipe').addEventListener('click', () => {
@@ -343,6 +374,7 @@ function resetForm() {
     document.getElementById('recipe-size').value = 'klein';
     document.getElementById('recipe-tags').value = '';
     document.querySelectorAll('.meal-checkbox').forEach(cb => cb.checked = false);
+    clearEmojiSelection();
     const preview = document.getElementById('recipe-image-preview');
     preview.src = '';
     preview.style.display = 'none';
