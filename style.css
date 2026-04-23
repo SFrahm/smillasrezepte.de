@@ -2,7 +2,7 @@ body {
     font-family: 'Georgia', serif;
     margin: 0;
     padding: 0;
-    background: radial-gradient(ellipse at top, #181828 0%, #121212 65%);
+    background: radial-gradient(ellipse at top, #0d1f22 0%, #121212 60%);
     min-height: 100vh;
     color: #ffffff;
 }
