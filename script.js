@@ -3,9 +3,23 @@ let filteredRecipes = [];
 let selectedImageDataUrl = '';
 
 async function loadRecipes() {
-    const response = await fetch('data.json');
-    const data = await response.json();
-    recipes = data.recipes;
+    try {
+        const snapshot = await db.ref('recipes').get();
+        if (snapshot.exists() && snapshot.val() && snapshot.val().length > 0) {
+            recipes = snapshot.val();
+        } else {
+            // Erster Start: Standardrezepte aus data.json in Firebase laden
+            const response = await fetch('data.json');
+            const data = await response.json();
+            recipes = data.recipes;
+            await db.ref('recipes').set(recipes);
+        }
+    } catch (e) {
+        // Fallback falls Firebase noch nicht konfiguriert ist
+        const response = await fetch('data.json');
+        const data = await response.json();
+        recipes = data.recipes;
+    }
     filteredRecipes = [...recipes];
     displayRecipes(filteredRecipes);
 }
@@ -133,7 +147,7 @@ document.getElementById('add-recipe-overlay').addEventListener('click', (event) 
     }
 });
 
-function saveRecipe() {
+async function saveRecipe() {
     const name = document.getElementById('recipe-name').value;
     const image = selectedImageDataUrl;
     const description = document.getElementById('recipe-description').value;
@@ -168,6 +182,11 @@ function saveRecipe() {
 
     recipes.push(newRecipe);
     filteredRecipes = [...recipes];
+    try {
+        await db.ref('recipes').set(recipes);
+    } catch (e) {
+        console.error('Firebase-Speichern fehlgeschlagen:', e);
+    }
     displayRecipes(filteredRecipes);
     document.getElementById('add-recipe-overlay').style.display = 'none';
     resetImageInput();
