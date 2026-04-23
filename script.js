@@ -288,11 +288,9 @@ document.getElementById('trash-overlay').addEventListener('click', (e) => {
 });
 
 const allFoodEmojis = [
-    '🍕','🥪','🌮','🌯','🥙','🧆','🧇','🥞',
-    '🍞','🥐','🥗','🥘','🍲','🍛','🍜','🍝','🍠',
-    '🍙','🍚','🍘','🥟','🍰','🍩','🍪','🍫','🍮','🥧','🍦','🍬','🍭',
-    '🥑','🥦','🥕','🌽','🍅','🧄','🧅','🥔','🫘','🍄','🥜','🫛',
-    '🍇','🍓','🫐','🍒','🍑','🥭','🍍','🍌','🍋','🍊','🍎','🍐','🥝','🍉',
+    '🍕','🍔','🥪','🌮','🌯','🥙','🧆','🧇','🥞',
+    '🥖','🥐','🥗','🥘','🍲','🍛','🍜','🍝','🍙','🍚','🥟',
+    '🍰','🍩','🍪','🍫','🍮','🥧','🍦',
 ];
 
 let emojiMode = 'ai';
@@ -396,18 +394,15 @@ const emojiKeywords = {
     '🍛': ['curry', 'dhal', 'indisch'],
     '🌮': ['taco', 'burrito', 'tortilla'],
     '🥙': ['wrap', 'falafel', 'pita'],
+    '�': ['sandwich', 'wrap', 'belegtes', 'snack'],
     '🥐': ['croissant', 'blätterteig', 'hörnchen'],
-    '🍞': ['brot', 'toast', 'brötchen', 'baguette'],
+    '🥖': ['brot', 'baguette'],
     '🥞': ['pancake', 'pfannkuchen', 'crêpe', 'waffel'],
     '🍰': ['kuchen', 'torte', 'tarte', 'dessert'],
     '🍩': ['donut', 'krapfen'],
     '🍪': ['keks', 'cookie', 'plätzchen'],
     '🍫': ['schoko', 'brownie', 'mousse', 'kakao'],
     '🍦': ['eis', 'sorbet', 'frozen'],
-    '🥑': ['avocado', 'guacamole'],
-    '🥔': ['kartoffel', 'pommes', 'gratin', 'gnocchi'],
-    '🍠': ['süßkartoffel'],
-    '🫘': ['bohne', 'linse', 'hummus', 'kichererbse'],
     '🥟': ['dumpling', 'teigtasche', 'gyoza'],
 };
 
