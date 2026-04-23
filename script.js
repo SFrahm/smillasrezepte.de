@@ -46,7 +46,7 @@ function displayTrash() {
     const container = document.getElementById('trash-list');
     container.innerHTML = '';
     if (trash.length === 0) {
-        container.innerHTML = '<p class="trash-empty">Nichts auf Eis gelegt.</p>';
+        container.innerHTML = '<p class="trash-empty">Keine Fails bisher.</p>';
     } else {
         trash.forEach(recipe => {
             const daysLeft = Math.ceil((TRASH_TTL - (Date.now() - recipe.deletedAt)) / (24 * 60 * 60 * 1000));
@@ -139,7 +139,7 @@ function displayRecipes(recipesToDisplay) {
             ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="card-no-image">🍽</div>'}
             <div class="card-bottom">
                 <h3>${recipe.name}</h3>
-                <button class="delete-btn" title="Auf Eis legen">🗑</button>
+                <button class="delete-btn" title="Zu Fails">🗑</button>
             </div>
         `;
         card.querySelector('.delete-btn').addEventListener('click', (e) => {
@@ -286,7 +286,7 @@ async function saveRecipe() {
     }
 
     const newRecipe = {
-        id: recipes.length + 1,
+        id: Date.now(),
         name,
         image,
         description,
