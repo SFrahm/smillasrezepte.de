@@ -287,9 +287,12 @@ document.getElementById('trash-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'trash-overlay') document.getElementById('trash-overlay').style.display = 'none';
 });
 
-const allFoodEmojis = [
+const savoryEmojis = [
     '🍕','🍔','🥪','🌮','🌯','🥙','🧆','🧇','🥞',
-    '🥖','🥐','🥗','🥘','🍲','🍛','🍜','🍝','🍙','🍚','🥟',
+    '🥖','🥐','🥗','🥘','🍲','🍛','🍜','🍝','🥟',
+];
+
+const sweetEmojis = [
     '🍰','🍩','🍪','🍫','🍮','🥧','🍦',
 ];
 
@@ -298,7 +301,10 @@ let emojiMode = 'ai';
 function buildEmojiPicker() {
     const picker = document.getElementById('emoji-picker');
     picker.innerHTML = '';
-    allFoodEmojis.forEach(emoji => {
+
+    const savoryRow = document.createElement('div');
+    savoryRow.className = 'emoji-row';
+    savoryEmojis.forEach(emoji => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'emoji-option';
@@ -309,8 +315,27 @@ function buildEmojiPicker() {
             document.querySelectorAll('#emoji-picker .emoji-option').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
         });
-        picker.appendChild(btn);
+        savoryRow.appendChild(btn);
     });
+
+    const sweetRow = document.createElement('div');
+    sweetRow.className = 'emoji-row';
+    sweetEmojis.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'emoji-option';
+        btn.textContent = emoji;
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            selectEmoji(emoji);
+            document.querySelectorAll('#emoji-picker .emoji-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+        sweetRow.appendChild(btn);
+    });
+
+    picker.appendChild(savoryRow);
+    picker.appendChild(sweetRow);
 }
 buildEmojiPicker();
 
@@ -342,6 +367,7 @@ function updateAIView(name) {
         });
         view.appendChild(btn);
     });
+    const allFoodEmojis = [...savoryEmojis, ...sweetEmojis];
     if (selectedImageDataUrl === '' || Object.keys(emojiKeywords).includes(selectedImageDataUrl) || allFoodEmojis.includes(selectedImageDataUrl)) {
         selectEmoji(top3[0]);
     }
