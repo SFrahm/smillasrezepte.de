@@ -2,6 +2,15 @@ let recipes = [];
 let filteredRecipes = [];
 let selectedImageDataUrl = '';
 
+function saveToLocalStorage() {
+    localStorage.setItem('smillas-recipes', JSON.stringify(recipes));
+}
+
+function loadFromLocalStorage() {
+    const stored = localStorage.getItem('smillas-recipes');
+    return stored ? JSON.parse(stored) : null;
+}
+
 async function loadRecipes() {
     try {
         const snapshot = await Promise.race([
@@ -11,16 +20,29 @@ async function loadRecipes() {
         if (snapshot.exists()) {
             const val = snapshot.val();
             recipes = Array.isArray(val) ? val.filter(r => r !== null) : Object.values(val);
+            saveToLocalStorage();
+        } else {
+            const local = loadFromLocalStorage();
+            if (local && local.length > 0) {
+                recipes = local;
+            } else {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                recipes = data.recipes;
+                saveToLocalStorage();
+            }
+            db.ref('recipes').set(recipes).catch(() => {});
+        }
+    } catch (e) {
+        const local = loadFromLocalStorage();
+        if (local && local.length > 0) {
+            recipes = local;
         } else {
             const response = await fetch('data.json');
             const data = await response.json();
             recipes = data.recipes;
-            db.ref('recipes').set(recipes).catch(() => {});
+            saveToLocalStorage();
         }
-    } catch (e) {
-        const response = await fetch('data.json');
-        const data = await response.json();
-        recipes = data.recipes;
     }
     filteredRecipes = [...recipes];
     displayRecipes(filteredRecipes);
@@ -190,11 +212,11 @@ async function saveRecipe() {
     document.getElementById('add-recipe-overlay').style.display = 'none';
     resetForm();
 
+    saveToLocalStorage();
     try {
-        db.ref('recipes').set(recipes).catch(e => console.error('Firebase:', e));
-    } catch (e) {
-        console.error('Firebase:', e);
-    }
+        db.ref('recipes').set(recipes).catch(() => {});
+    } catch (e) {}
+
     // In Realität würde man das in data.json speichern, aber für Demo reicht das.
 }
 
