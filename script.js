@@ -125,6 +125,20 @@ async function loadRecipes() {
     }
     cleanupTrash();
 
+    // Kaputte via.placeholder.com URLs automatisch ersetzen
+    let migrated = false;
+    recipes = recipes.map(r => {
+        if (r.image && r.image.includes('via.placeholder.com')) {
+            migrated = true;
+            return { ...r, image: r.image.replace(/https:\/\/via\.placeholder\.com\/(\d+x\d+)\?/, 'https://placehold.co/$1/0d1f22/00bcd4?') };
+        }
+        return r;
+    });
+    if (migrated) {
+        saveToLocalStorage();
+        try { db.ref('recipes').set(recipes).catch(() => {}); } catch(e) {}
+    }
+
     filteredRecipes = [...recipes];
     displayRecipes(filteredRecipes);
 }
