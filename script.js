@@ -32,7 +32,7 @@ function displayRecipes(recipesToDisplay) {
         const card = document.createElement('div');
         card.className = 'recipe-card';
         card.innerHTML = `
-            <img src="${recipe.image}" alt="${recipe.name}">
+            ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="card-no-image">🍽</div>'}
             <h3>${recipe.name}</h3>
         `;
         card.addEventListener('click', () => showRecipeDetail(recipe));
@@ -43,7 +43,7 @@ function displayRecipes(recipesToDisplay) {
 function showRecipeDetail(recipe) {
     const content = document.getElementById('recipe-detail-content');
     content.innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.name}">
+        ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="detail-no-image">🍽</div>'}
         <h2>${recipe.name}</h2>
         <p class="detail-description">${recipe.description}</p>
         <div class="detail-meta">
@@ -161,7 +161,7 @@ async function saveRecipe() {
     const size = document.getElementById('recipe-size').value;
     const tags = document.getElementById('recipe-tags').value.split(',');
 
-    if (!name || !image || !description || !instructions || !calories || !protein || !category || meal.length === 0 || !size) {
+    if (!name || !description || !instructions || !calories || !protein || !category || meal.length === 0 || !size) {
         alert('Bitte alle erforderlichen Felder ausfüllen und mindestens eine Mahlzeit auswählen!');
         return;
     }
