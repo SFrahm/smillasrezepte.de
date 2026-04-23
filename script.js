@@ -7,38 +7,17 @@ async function loadRecipes() {
     recipes = data.recipes;
     filteredRecipes = [...recipes];
     displayRecipes(filteredRecipes);
-    displayForYou();
 }
 
 function displayRecipes(recipesToDisplay) {
-    const container = document.getElementById('recipe-list');
+    const container = document.getElementById('recipes-grid');
     container.innerHTML = '';
     recipesToDisplay.forEach(recipe => {
-        const recipeEl = document.createElement('div');
-        recipeEl.className = 'recipe-detail';
-        recipeEl.innerHTML = `
-            <h3>${recipe.name}</h3>
-            <img src="${recipe.image}" alt="${recipe.name}" style="max-width: 300px;">
-            <p><strong>Beschreibung:</strong> ${recipe.description}</p>
-            <p><strong>Zutaten:</strong> ${recipe.ingredients.join(', ')}</p>
-            <p><strong>Zubereitung:</strong> ${recipe.instructions}</p>
-            <p><strong>Kalorien:</strong> ${recipe.calories} | <strong>Protein:</strong> ${recipe.protein}g</p>
-            <p><strong>Kategorie:</strong> ${recipe.category} | <strong>Mahlzeit:</strong> ${Array.isArray(recipe.meal) ? recipe.meal.join(', ') : recipe.meal} | <strong>Größe:</strong> ${recipe.size}</p>
-        `;
-        container.appendChild(recipeEl);
-    });
-}
-
-function displayForYou() {
-    const container = document.getElementById('for-you-recipes');
-    container.innerHTML = '';
-    recipes.forEach(recipe => {
         const card = document.createElement('div');
         card.className = 'recipe-card';
         card.innerHTML = `
             <img src="${recipe.image}" alt="${recipe.name}">
             <h3>${recipe.name}</h3>
-            <p>${recipe.description}</p>
         `;
         card.addEventListener('click', () => showRecipeDetail(recipe));
         container.appendChild(card);
@@ -46,20 +25,34 @@ function displayForYou() {
 }
 
 function showRecipeDetail(recipe) {
-    const params = new URLSearchParams({
-        name: recipe.name,
-        image: recipe.image,
-        description: recipe.description,
-        ingredients: recipe.ingredients.join(','),
-        instructions: recipe.instructions,
-        calories: recipe.calories,
-        protein: recipe.protein,
-        category: recipe.category,
-        meal: JSON.stringify(recipe.meal),
-        size: recipe.size
-    });
-    window.open(`recipe.html?${params.toString()}`, '_blank');
+    const content = document.getElementById('recipe-detail-content');
+    content.innerHTML = `
+        <img src="${recipe.image}" alt="${recipe.name}">
+        <h2>${recipe.name}</h2>
+        <p class="detail-description">${recipe.description}</p>
+        <div class="detail-meta">
+            <span>${recipe.calories} kcal</span>
+            <span>${recipe.protein}g Protein</span>
+            <span>${recipe.category}</span>
+            <span>${Array.isArray(recipe.meal) ? recipe.meal.join(', ') : recipe.meal}</span>
+            <span>${recipe.size}</span>
+        </div>
+        <h4>Zutaten</h4>
+        <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+        <h4>Zubereitung</h4>
+        <p>${recipe.instructions}</p>
+    `;
+    document.getElementById('recipe-detail-overlay').style.display = 'flex';
 }
+
+document.getElementById('close-detail').addEventListener('click', () => {
+    document.getElementById('recipe-detail-overlay').style.display = 'none';
+});
+document.getElementById('recipe-detail-overlay').addEventListener('click', (event) => {
+    if (event.target.id === 'recipe-detail-overlay') {
+        document.getElementById('recipe-detail-overlay').style.display = 'none';
+    }
+});
 
 document.getElementById('search-input').addEventListener('input', filterRecipes);
 document.getElementById('filter-btn').addEventListener('click', () => {
@@ -161,7 +154,6 @@ function saveRecipe() {
     recipes.push(newRecipe);
     filteredRecipes = [...recipes];
     displayRecipes(filteredRecipes);
-    displayForYou();
     document.getElementById('add-recipe-overlay').style.display = 'none';
     // In Realität würde man das in data.json speichern, aber für Demo reicht das.
 }

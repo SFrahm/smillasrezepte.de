@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+2<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -59,14 +59,17 @@
         </div>
     </div>
 
-    <section id="for-you">
-        <h2>For You</h2>
-        <div id="for-you-recipes" class="recipe-grid"></div>
-    </section>
-
     <section id="recipe-list">
         <h2>Alle Rezepte</h2>
+        <div id="recipes-grid" class="recipe-grid"></div>
     </section>
+
+    <div id="recipe-detail-overlay">
+        <div id="recipe-detail-popup">
+            <button id="close-detail">&times;</button>
+            <div id="recipe-detail-content"></div>
+        </div>
+    </div>
 
     <div id="add-recipe-overlay">
         <div id="add-recipe-form">
