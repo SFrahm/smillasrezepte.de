@@ -4,19 +4,20 @@ let selectedImageDataUrl = '';
 
 async function loadRecipes() {
     try {
-        const snapshot = await db.ref('recipes').get();
+        const snapshot = await Promise.race([
+            db.ref('recipes').get(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        ]);
         if (snapshot.exists()) {
             const val = snapshot.val();
             recipes = Array.isArray(val) ? val.filter(r => r !== null) : Object.values(val);
         } else {
-            // Erster Start: Standardrezepte aus data.json in Firebase laden
             const response = await fetch('data.json');
             const data = await response.json();
             recipes = data.recipes;
-            await db.ref('recipes').set(recipes);
+            db.ref('recipes').set(recipes).catch(() => {});
         }
     } catch (e) {
-        // Fallback falls Firebase noch nicht konfiguriert ist
         const response = await fetch('data.json');
         const data = await response.json();
         recipes = data.recipes;
@@ -183,14 +184,17 @@ async function saveRecipe() {
 
     recipes.push(newRecipe);
     filteredRecipes = [...recipes];
-    try {
-        await db.ref('recipes').set(recipes);
-    } catch (e) {
-        console.error('Firebase-Speichern fehlgeschlagen:', e);
-    }
+
+    // UI sofort aktualisieren, Firebase im Hintergrund speichern
     displayRecipes(filteredRecipes);
     document.getElementById('add-recipe-overlay').style.display = 'none';
     resetForm();
+
+    try {
+        db.ref('recipes').set(recipes).catch(e => console.error('Firebase:', e));
+    } catch (e) {
+        console.error('Firebase:', e);
+    }
     // In Realität würde man das in data.json speichern, aber für Demo reicht das.
 }
 
