@@ -2,6 +2,7 @@ let recipes = [];
 let filteredRecipes = [];
 let trash = [];
 let selectedImageDataUrl = '';
+let activeRecipeId = null;
 
 const TRASH_TTL = 5 * 24 * 60 * 60 * 1000;
 
@@ -168,9 +169,16 @@ function displayRecipes(recipesToDisplay) {
             ${imgHtml(recipe, 'card')}
             <div class="card-bottom">
                 <h3>${recipe.name}</h3>
-                <button class="delete-btn" title="Zu Fails">🗑</button>
+                <div class="card-actions">
+                    <button class="edit-btn" title="Bearbeiten">✏️</button>
+                    <button class="delete-btn" title="Löschen">🗑️</button>
+                </div>
             </div>
         `;
+        card.querySelector('.edit-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openRecipeForm(recipe);
+        });
         card.querySelector('.delete-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             deleteRecipe(recipe);
@@ -184,6 +192,9 @@ function showRecipeDetail(recipe) {
     const content = document.getElementById('recipe-detail-content');
     content.innerHTML = `
         ${imgHtml(recipe, 'detail')}
+        <div class="detail-actions">
+            <button id="detail-edit-btn" class="edit-btn" type="button">Bearbeiten</button>
+        </div>
         <h2>${recipe.name}</h2>
         <p class="detail-description">${recipe.description}</p>
         <div class="detail-meta">
@@ -198,6 +209,14 @@ function showRecipeDetail(recipe) {
         <h4>Zubereitung</h4>
         <p>${recipe.instructions}</p>
     `;
+    const detailEditButton = document.getElementById('detail-edit-btn');
+    if (detailEditButton) {
+        detailEditButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('recipe-detail-overlay').style.display = 'none';
+            openRecipeForm(recipe);
+        });
+    }
     document.getElementById('recipe-detail-overlay').style.display = 'flex';
 }
 
@@ -258,9 +277,7 @@ function applyFilters() {
     document.getElementById('filter-popup').style.display = 'none';
 }
 
-document.getElementById('add-recipe-btn').addEventListener('click', () => {
-    document.getElementById('add-recipe-overlay').style.display = 'flex';
-});
+document.getElementById('add-recipe-btn').addEventListener('click', () => openRecipeForm());
 
 document.getElementById('trash-btn').addEventListener('click', displayTrash);
 document.getElementById('close-trash').addEventListener('click', () => {
@@ -271,13 +288,11 @@ document.getElementById('trash-overlay').addEventListener('click', (e) => {
 });
 
 const allFoodEmojis = [
-    '🍕','🍔','🍟','🌭','🥪','🌮','🌯','🥙','🧆','🥚','🍳','🧇','🥞','🧈',
-    '🍞','🥐','🥖','🫓','🥨','🧀','🥗','🥘','🫕','🍲','🍛','🍜','🍝','🍠',
-    '🍱','🍣','🍤','🍙','🍚','🍘','🥟','🥡','🦐','🐟','🥩','🍗','🥓',
-    '🍰','🎂','🧁','🍩','🍪','🍫','🍮','🥧','🍦','🍧','🍨','🍬','🍭',
+    '🍕','🥪','🌮','🌯','🥙','🧆','🧇','🥞',
+    '🍞','🥐','🥗','🥘','🍲','🍛','🍜','🍝','🍠',
+    '🍙','🍚','🍘','🥟','🍰','🍩','🍪','🍫','🍮','🥧','🍦','🍬','🍭',
     '🥑','🥦','🥕','🌽','🍅','🧄','🧅','🥔','🫘','🍄','🥜','🫛',
     '🍇','🍓','🫐','🍒','🍑','🥭','🍍','🍌','🍋','🍊','🍎','🍐','🥝','🍉',
-    '☕','🫖','🧃','🥤','🧋','🍵','🍶','🧊',
 ];
 
 let emojiMode = 'ai';
@@ -373,23 +388,18 @@ function clearEmojiSelection() {
 const emojiKeywords = {
     '🍕': ['pizza', 'flammkuchen'],
     '🍔': ['burger', 'hamburger'],
-    '🍝': ['pasta', 'nudel', 'spaghetti', 'linguine', 'penne', 'tagliatelle', 'lasagne', 'carbonara', 'bolognese'],
-    '🍣': ['sushi', 'maki', 'nigiri'],
+    '🍝': ['pasta', 'nudel', 'spaghetti', 'linguine', 'penne', 'tagliatelle', 'lasagne', 'bolognese'],
     '🥗': ['salat', 'bowl', 'caesar'],
-    '🍲': ['suppe', 'eintopf', 'brühe', 'chili', 'gulasch'],
+    '🍲': ['suppe', 'eintopf', 'brühe', 'chili'],
     '🍜': ['ramen', 'pho', 'nudelsuppe', 'miso'],
     '🥘': ['pfanne', 'wok', 'paella', 'risotto'],
     '🍛': ['curry', 'dhal', 'indisch'],
-    '🍳': ['ei', 'omelette', 'scramble', 'rührei', 'spiegelei', 'frühstück'],
-    '🥩': ['steak', 'rind', 'schnitzel', 'fleisch'],
-    '🍗': ['hähnchen', 'huhn', 'chicken', 'hühnchen', 'pute'],
     '🌮': ['taco', 'burrito', 'tortilla'],
-    '🥙': ['wrap', 'döner', 'falafel', 'pita', 'gyros'],
+    '🥙': ['wrap', 'falafel', 'pita'],
     '🥐': ['croissant', 'blätterteig', 'hörnchen'],
     '🍞': ['brot', 'toast', 'brötchen', 'baguette'],
     '🥞': ['pancake', 'pfannkuchen', 'crêpe', 'waffel'],
-    '🍰': ['kuchen', 'torte', 'käsekuchen', 'tarte', 'cheesecake'],
-    '🧁': ['muffin', 'cupcake'],
+    '🍰': ['kuchen', 'torte', 'tarte', 'dessert'],
     '🍩': ['donut', 'krapfen'],
     '🍪': ['keks', 'cookie', 'plätzchen'],
     '🍫': ['schoko', 'brownie', 'mousse', 'kakao'],
@@ -398,13 +408,7 @@ const emojiKeywords = {
     '🥔': ['kartoffel', 'pommes', 'gratin', 'gnocchi'],
     '🍠': ['süßkartoffel'],
     '🫘': ['bohne', 'linse', 'hummus', 'kichererbse'],
-    '🧀': ['käse', 'quiche', 'fondue'],
-    '🐟': ['fisch', 'lachs', 'forelle', 'thunfisch', 'kabeljau'],
-    '🦐': ['garnele', 'shrimp', 'meeresfrüchte'],
     '🥟': ['dumpling', 'teigtasche', 'gyoza'],
-    '☕': ['kaffee', 'latte', 'cappuccino', 'tiramisu'],
-    '🫖': ['tee', 'matcha'],
-    '🥤': ['smoothie', 'shake'],
 };
 
 function suggestEmojis(name) {
@@ -458,26 +462,34 @@ async function saveRecipe() {
         return;
     }
 
-    const newRecipe = {
-        id: Date.now(),
+    const recipeData = {
+        id: activeRecipeId || Date.now(),
         name,
         image,
         description,
-        ingredients: ingredients.map(i => i.trim()),
+        ingredients: ingredients.map(i => i.trim()).filter(Boolean),
         instructions,
         calories,
         protein,
         category,
         meal,
         size,
-        tags: tags.map(t => t.trim())
+        tags: tags.map(t => t.trim()).filter(Boolean)
     };
 
-    recipes.push(newRecipe);
-    filteredRecipes = [...recipes];
+    if (activeRecipeId) {
+        const existingIndex = recipes.findIndex(r => r.id === activeRecipeId);
+        if (existingIndex !== -1) {
+            recipes[existingIndex] = recipeData;
+        } else {
+            recipes.push(recipeData);
+        }
+    } else {
+        recipes.push(recipeData);
+    }
+    activeRecipeId = null;
+    filterRecipes();
 
-    // UI sofort aktualisieren, Firebase im Hintergrund speichern
-    displayRecipes(filteredRecipes);
     document.getElementById('add-recipe-overlay').style.display = 'none';
     resetForm();
 
@@ -485,8 +497,61 @@ async function saveRecipe() {
     try {
         db.ref('recipes').set(recipes).catch(() => {});
     } catch (e) {}
+}
 
-    // In Realität würde man das in data.json speichern, aber für Demo reicht das.
+function openRecipeForm(recipe = null) {
+    activeRecipeId = recipe ? recipe.id : null;
+    if (recipe) {
+        fillForm(recipe);
+    } else {
+        resetForm();
+    }
+    document.getElementById('add-recipe-overlay').style.display = 'flex';
+}
+
+function fillForm(recipe) {
+    selectedImageDataUrl = recipe.image || '';
+    document.getElementById('recipe-name').value = recipe.name || '';
+    document.getElementById('recipe-image').value = '';
+    document.getElementById('recipe-description').value = recipe.description || '';
+    document.getElementById('recipe-ingredients').value = Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : (recipe.ingredients || '');
+    document.getElementById('recipe-instructions').value = recipe.instructions || '';
+    document.getElementById('recipe-calories').value = recipe.calories || '';
+    document.getElementById('recipe-protein').value = recipe.protein || '';
+    document.getElementById('recipe-category').value = recipe.category || 'süß';
+    document.getElementById('recipe-size').value = recipe.size || 'klein';
+    document.getElementById('recipe-tags').value = Array.isArray(recipe.tags) ? recipe.tags.join(', ') : (recipe.tags || '');
+    document.querySelectorAll('.meal-checkbox').forEach(cb => {
+        const mealValues = Array.isArray(recipe.meal) ? recipe.meal : [recipe.meal];
+        cb.checked = mealValues.includes(cb.value);
+    });
+
+    const preview = document.getElementById('recipe-image-preview');
+    if (isUrl(recipe.image)) {
+        preview.src = recipe.image;
+        preview.style.display = 'block';
+    } else {
+        preview.src = '';
+        preview.style.display = 'none';
+    }
+
+    if (recipe.image && !isUrl(recipe.image)) {
+        emojiMode = 'manual';
+        document.getElementById('mode-manual').classList.add('active');
+        document.getElementById('mode-ai').classList.remove('active');
+        document.getElementById('emoji-ai-view').style.display = 'none';
+        document.getElementById('emoji-manual-view').style.display = '';
+        clearEmojiSelection();
+        const emojiButton = Array.from(document.querySelectorAll('.emoji-option')).find(btn => btn.textContent === recipe.image);
+        if (emojiButton) emojiButton.classList.add('selected');
+    } else {
+        emojiMode = 'ai';
+        document.getElementById('mode-ai').classList.add('active');
+        document.getElementById('mode-manual').classList.remove('active');
+        document.getElementById('emoji-ai-view').style.display = '';
+        document.getElementById('emoji-manual-view').style.display = 'none';
+        updateAIView(recipe.name || '');
+    }
 }
 
 function resetForm() {
