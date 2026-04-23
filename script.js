@@ -5,8 +5,9 @@ let selectedImageDataUrl = '';
 async function loadRecipes() {
     try {
         const snapshot = await db.ref('recipes').get();
-        if (snapshot.exists() && snapshot.val() && snapshot.val().length > 0) {
-            recipes = snapshot.val();
+        if (snapshot.exists()) {
+            const val = snapshot.val();
+            recipes = Array.isArray(val) ? val.filter(r => r !== null) : Object.values(val);
         } else {
             // Erster Start: Standardrezepte aus data.json in Firebase laden
             const response = await fetch('data.json');
@@ -195,7 +196,17 @@ async function saveRecipe() {
 
 function resetForm() {
     selectedImageDataUrl = '';
-    document.getElementById('add-recipe-form').reset();
+    document.getElementById('recipe-name').value = '';
+    document.getElementById('recipe-image').value = '';
+    document.getElementById('recipe-description').value = '';
+    document.getElementById('recipe-ingredients').value = '';
+    document.getElementById('recipe-instructions').value = '';
+    document.getElementById('recipe-calories').value = '';
+    document.getElementById('recipe-protein').value = '';
+    document.getElementById('recipe-category').value = 'süß';
+    document.getElementById('recipe-size').value = 'klein';
+    document.getElementById('recipe-tags').value = '';
+    document.querySelectorAll('.meal-checkbox').forEach(cb => cb.checked = false);
     const preview = document.getElementById('recipe-image-preview');
     preview.src = '';
     preview.style.display = 'none';
