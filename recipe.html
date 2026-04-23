@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezept Details</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 id="recipe-title"></h1>
+    </header>
+    <div class="recipe-detail">
+        <img id="recipe-image" alt="Rezept Bild" style="max-width: 100%; height: auto;">
+        <p id="recipe-description"></p>
+        <h3>Zutaten</h3>
+        <ul id="recipe-ingredients"></ul>
+        <h3>Zubereitung</h3>
+        <p id="recipe-instructions"></p>
+        <p><strong>Kalorien:</strong> <span id="recipe-calories"></span> | <strong>Protein:</strong> <span id="recipe-protein"></span>g</p>
+        <p><strong>Kategorie:</strong> <span id="recipe-category"></span> | <strong>Mahlzeit:</strong> <span id="recipe-meal"></span> | <strong>Größe:</strong> <span id="recipe-size"></span></p>
+    </div>
+    <button onclick="window.close()">Schließen</button>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('recipe-title').textContent = urlParams.get('name');
+        document.getElementById('recipe-image').src = urlParams.get('image');
+        document.getElementById('recipe-description').textContent = urlParams.get('description');
+        document.getElementById('recipe-calories').textContent = urlParams.get('calories');
+        document.getElementById('recipe-protein').textContent = urlParams.get('protein');
+        document.getElementById('recipe-category').textContent = urlParams.get('category');
+        const meals = JSON.parse(urlParams.get('meal'));
+        document.getElementById('recipe-meal').textContent = Array.isArray(meals) ? meals.join(', ') : meals;
+        document.getElementById('recipe-size').textContent = urlParams.get('size');
+        document.getElementById('recipe-instructions').textContent = urlParams.get('instructions');
+        const ingredients = urlParams.get('ingredients').split(',');
+        const ul = document.getElementById('recipe-ingredients');
+        ingredients.forEach(ing => {
+            const li = document.createElement('li');
+            li.textContent = ing.trim();
+            ul.appendChild(li);
+        });
+    </script>
+</body>
+</html>

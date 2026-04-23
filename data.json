@@ -1,0 +1,46 @@
+{
+  "recipes": [
+    {
+      "id": 1,
+      "name": "Veganer Tofu-Scramble",
+      "image": "https://via.placeholder.com/300x200?text=Tofu-Scramble",
+      "description": "Ein proteinreiches Frühstücksgericht mit Tofu als Ei-Ersatz.",
+      "ingredients": ["Tofu", "Paprika", "Zwiebel", "Kurcuma", "Salz"],
+      "instructions": "Tofu zerbröseln, Gemüse anbraten, Gewürze hinzufügen, servieren.",
+      "calories": 250,
+      "protein": 20,
+      "category": "herzhaft",
+      "meal": ["Frühstück"],
+      "size": "mittel",
+      "tags": ["Tofu", "Proteinreich"]
+    },
+    {
+      "id": 2,
+      "name": "Veganer Schokoladenkuchen",
+      "image": "https://via.placeholder.com/300x200?text=Schokoladenkuchen",
+      "description": "Saftiger veganer Kuchen mit dunkler Schokolade.",
+      "ingredients": ["Mehl", "Zucker", "Kakao", "Pflanzenmilch", "Backpulver"],
+      "instructions": "Alles mischen, in Form geben, backen bei 180°C 30 Min.",
+      "calories": 300,
+      "protein": 5,
+      "category": "süß",
+      "meal": "Snack",
+      "size": "mittel",
+      "tags": ["Schokolade", "Kuchen"]
+    },
+    {
+      "id": 3,
+      "name": "Linsensuppe",
+      "image": "https://via.placeholder.com/300x200?text=Linsensuppe",
+      "description": "Herzhafte Suppe mit Linsen und Gemüse.",
+      "ingredients": ["Linsen", "Karotten", "Zwiebel", "Knoblauch", "Gewürze"],
+      "instructions": "Gemüse anbraten, Linsen hinzufügen, mit Wasser aufgießen, köcheln.",
+      "calories": 200,
+      "protein": 15,
+      "category": "herzhaft",
+      "meal": ["Mittagessen"],
+      "size": "groß",
+      "tags": ["Linsen", "Suppe"]
+    }
+  ]
+}

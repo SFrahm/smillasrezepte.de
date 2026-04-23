@@ -1,1 +1,139 @@
-hallo
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smillas Rezepte</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Smillas Rezepte</h1>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Suche nach Rezepten...">
+        <button id="filter-btn">Filter</button>
+        <button id="add-recipe-btn" style="margin-left: 10px; padding: 10px 20px; font-size: 16px;">+ Neues Rezept</button>
+    </div>
+
+    <div id="filter-overlay">
+        <div id="filter-popup">
+            <h3>Filter</h3>
+            <div class="filter-section">
+                <h4>Kalorien</h4>
+                <input type="number" id="min-calories" placeholder="Min">
+                <input type="number" id="max-calories" placeholder="Max">
+            </div>
+            <div class="filter-section">
+                <h4>Proteine (g)</h4>
+                <input type="number" id="min-protein" placeholder="Min">
+                <input type="number" id="max-protein" placeholder="Max">
+            </div>
+            <div class="filter-section">
+                <h4>Kategorie</h4>
+                <label><input type="checkbox" value="süß" class="category-filter"> Süß</label>
+                <label><input type="checkbox" value="herzhaft" class="category-filter"> Herzhaft</label>
+            </div>
+            <div class="filter-section">
+                <h4>Mahlzeit</h4>
+                <label><input type="checkbox" value="Frühstück" class="meal-filter"> Frühstück</label>
+                <label><input type="checkbox" value="Mittagessen" class="meal-filter"> Mittagessen</label>
+                <label><input type="checkbox" value="Abendessen" class="meal-filter"> Abendessen</label>
+                <label><input type="checkbox" value="Snack" class="meal-filter"> Snack</label>
+            </div>
+            <div class="filter-section">
+                <h4>Größe</h4>
+                <label><input type="checkbox" value="klein" class="size-filter"> Klein</label>
+                <label><input type="checkbox" value="mittel" class="size-filter"> Mittel</label>
+                <label><input type="checkbox" value="groß" class="size-filter"> Groß</label>
+            </div>
+            <div class="filter-section">
+                <h4>Zutaten</h4>
+                <input type="text" id="ingredients-input" placeholder="Zutaten durch Komma trennen">
+            </div>
+            <div class="popup-actions">
+                <button id="apply-filters">Anwenden</button>
+                <button id="close-filter">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <section id="for-you">
+        <h2>For You</h2>
+        <div id="for-you-recipes" class="recipe-grid"></div>
+    </section>
+
+    <section id="recipe-list">
+        <h2>Alle Rezepte</h2>
+    </section>
+
+    <div id="add-recipe-overlay">
+        <div id="add-recipe-form">
+            <h3>Neues Rezept hinzufügen</h3>
+            <div class="form-group">
+                <label for="recipe-name">Name *</label>
+                <input type="text" id="recipe-name" required>
+            </div>
+            <div class="form-group">
+                <label for="recipe-image">Bild-URL *</label>
+                <input type="url" id="recipe-image" required>
+            </div>
+            <div class="form-group">
+                <label for="recipe-description">Beschreibung *</label>
+                <textarea id="recipe-description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="recipe-ingredients">Zutaten (durch Komma trennen)</label>
+                <textarea id="recipe-ingredients"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="recipe-instructions">Zubereitung *</label>
+                <textarea id="recipe-instructions" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="recipe-calories">Kalorien *</label>
+                <input type="number" id="recipe-calories" required>
+            </div>
+            <div class="form-group">
+                <label for="recipe-protein">Proteine (g) *</label>
+                <input type="number" id="recipe-protein" required>
+            </div>
+            <div class="form-group">
+                <label for="recipe-category">Kategorie *</label>
+                <select id="recipe-category" required>
+                    <option value="süß">Süß</option>
+                    <option value="herzhaft">Herzhaft</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Mahlzeit * (mehrere auswählbar)</label>
+                <div class="checkbox-list">
+                    <label><input type="checkbox" value="Frühstück" class="meal-checkbox"> Frühstück</label>
+                    <label><input type="checkbox" value="Mittagessen" class="meal-checkbox"> Mittagessen</label>
+                    <label><input type="checkbox" value="Abendessen" class="meal-checkbox"> Abendessen</label>
+                    <label><input type="checkbox" value="Snack" class="meal-checkbox"> Snack</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="recipe-size">Größe *</label>
+                <select id="recipe-size" required>
+                    <option value="klein">Klein</option>
+                    <option value="mittel">Mittel</option>
+                    <option value="groß">Groß</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="recipe-tags">Tags (Zutaten, durch Komma trennen)</label>
+                <input type="text" id="recipe-tags">
+            </div>
+            <div class="popup-actions">
+                <button id="save-recipe">Speichern</button>
+                <button id="cancel-recipe">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
