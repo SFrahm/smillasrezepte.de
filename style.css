@@ -763,6 +763,18 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 0 1px rgba(0, 188, 212, 0.3);
 }
 
+.emoji-option.suggested {
+    order: -1;
+    border-color: rgba(0, 188, 212, 0.4);
+    background: rgba(0, 188, 212, 0.07);
+}
+
+#emoji-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 #recipe-image-preview {
     display: none;
     width: 100%;

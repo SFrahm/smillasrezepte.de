@@ -299,6 +299,80 @@ function clearEmojiSelection() {
     document.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('selected'));
 }
 
+const emojiKeywords = {
+    '🍕': ['pizza', 'flammkuchen'],
+    '🍔': ['burger', 'hamburger'],
+    '🍝': ['pasta', 'nudel', 'spaghetti', 'linguine', 'penne', 'tagliatelle', 'lasagne', 'carbonara', 'bolognese'],
+    '🍣': ['sushi', 'maki', 'nigiri'],
+    '🥗': ['salat', 'bowl', 'caesar'],
+    '🍲': ['suppe', 'eintopf', 'brühe', 'chili', 'gulasch'],
+    '🍜': ['ramen', 'pho', 'nudelsuppe', 'miso'],
+    '🥘': ['pfanne', 'wok', 'paella', 'risotto'],
+    '🍛': ['curry', 'dhal', 'indisch'],
+    '🍳': ['ei', 'omelette', 'scramble', 'rührei', 'spiegelei', 'frühstück'],
+    '🥩': ['steak', 'rind', 'schnitzel', 'fleisch'],
+    '🍗': ['hähnchen', 'huhn', 'chicken', 'hühnchen', 'pute'],
+    '🌮': ['taco', 'burrito', 'tortilla'],
+    '🥙': ['wrap', 'döner', 'falafel', 'pita', 'gyros'],
+    '🥐': ['croissant', 'blätterteig', 'hörnchen'],
+    '🍞': ['brot', 'toast', 'brötchen', 'baguette'],
+    '🥞': ['pancake', 'pfannkuchen', 'crêpe', 'waffel'],
+    '🍰': ['kuchen', 'torte', 'käsekuchen', 'tarte', 'cheesecake'],
+    '🧁': ['muffin', 'cupcake'],
+    '🍩': ['donut', 'krapfen'],
+    '🍪': ['keks', 'cookie', 'plätzchen'],
+    '🍫': ['schoko', 'brownie', 'mousse', 'kakao'],
+    '🍦': ['eis', 'sorbet', 'frozen'],
+    '🥑': ['avocado', 'guacamole'],
+    '🥔': ['kartoffel', 'pommes', 'gratin', 'gnocchi'],
+    '🍠': ['süßkartoffel'],
+    '🫘': ['bohne', 'linse', 'hummus', 'kichererbse'],
+    '🧀': ['käse', 'quiche', 'fondue'],
+    '🐟': ['fisch', 'lachs', 'forelle', 'thunfisch', 'kabeljau'],
+    '🦐': ['garnele', 'shrimp', 'meeresfrüchte'],
+    '🥟': ['dumpling', 'teigtasche', 'gyoza'],
+    '☕': ['kaffee', 'latte', 'cappuccino', 'tiramisu'],
+    '🫖': ['tee', 'matcha'],
+    '🥤': ['smoothie', 'shake'],
+};
+
+function suggestEmojis(name) {
+    const lower = name.toLowerCase();
+    const scores = {};
+    for (const [emoji, keywords] of Object.entries(emojiKeywords)) {
+        for (const kw of keywords) {
+            if (lower.includes(kw)) {
+                scores[emoji] = (scores[emoji] || 0) + kw.length;
+            }
+        }
+    }
+    return Object.entries(scores)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([emoji]) => emoji);
+}
+
+document.getElementById('recipe-name').addEventListener('input', function () {
+    if (selectedImageDataUrl && !Object.keys(emojiKeywords).includes(selectedImageDataUrl)) return;
+    const suggestions = suggestEmojis(this.value);
+    highlightSuggestedEmojis(suggestions);
+    if (suggestions.length > 0) {
+        clearEmojiSelection();
+        const btn = [...document.querySelectorAll('.emoji-option')]
+            .find(b => b.textContent === suggestions[0]);
+        if (btn) {
+            btn.classList.add('selected');
+            selectedImageDataUrl = suggestions[0];
+        }
+    }
+});
+
+function highlightSuggestedEmojis(suggestions) {
+    document.querySelectorAll('.emoji-option').forEach(btn => {
+        btn.classList.toggle('suggested', suggestions.includes(btn.textContent));
+    });
+}
+
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
 document.getElementById('cancel-recipe').addEventListener('click', () => {
     document.getElementById('add-recipe-overlay').style.display = 'none';
@@ -375,6 +449,7 @@ function resetForm() {
     document.getElementById('recipe-tags').value = '';
     document.querySelectorAll('.meal-checkbox').forEach(cb => cb.checked = false);
     clearEmojiSelection();
+    document.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('suggested'));
     const preview = document.getElementById('recipe-image-preview');
     preview.src = '';
     preview.style.display = 'none';
