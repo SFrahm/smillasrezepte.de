@@ -3,6 +3,7 @@ body {
     margin: 0;
     padding: 0;
     background: radial-gradient(ellipse at top, #181828 0%, #121212 65%);
+    min-height: 100vh;
     color: #ffffff;
 }
 
