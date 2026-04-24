@@ -420,7 +420,7 @@ const emojiKeywords = {
     '🍛': ['curry', 'dhal', 'indisch'],
     '🌮': ['taco', 'tortilla'], 
     '🌯': ['burrito', 'wrap'],
-    '🥙': ['döner', 'falafel', 'pita'],
+    '🥙': ['döner', 'fladenbrot', 'pita'],
     '🧆': ['falafel', 'bällchen', 'taler'],
     '🥪': ['sandwich', 'wrap', 'belegtes', 'snack'],
     '🥐': ['croissant', 'blätterteig', 'hörnchen'],
