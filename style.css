@@ -66,8 +66,7 @@ header {
     }
     #search-input,
     #filter-btn,
-    #add-recipe-btn,
-    #trash-btn {
+    #add-recipe-btn {
         width: 100%;
         margin: 0;
         border-radius: 10px;
@@ -288,7 +287,12 @@ header {
 }
 
 #trash-btn {
-    margin-left: 10px;
+    width: 100%;
+    margin: 0;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+
     background: linear-gradient(145deg, #555, #3a3a3a);
     box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
 }
@@ -296,7 +300,6 @@ header {
 #trash-btn:hover {
     background: linear-gradient(145deg, #666, #444);
 }
-
 #trash-overlay {
     display: none;
     position: fixed;
