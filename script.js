@@ -293,7 +293,7 @@ const savoryEmojis = [
 ];
 
 const sweetEmojis = [
-    '🍰','🍩','🍪','🍫','🍮','🥧','🍦', 
+    '🍰','🥧','🍩','🍪','🍫','🍮','🍦', '🧇', '🥞',
 ];
 
 let emojiMode = 'ai';
