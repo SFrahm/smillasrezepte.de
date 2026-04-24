@@ -80,13 +80,14 @@ header {
         border-radius: 10px;
         margin-bottom: 10px;
     }
+
     #trash-btn {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translateX(-50%);
+        width: 100%;
+        margin-left: 0;
+        border-radius: 10px;
+        margin-bottom: 10px;
     }
-    
+
     .recipe-grid {
         grid-template-columns: 1fr;
     }
