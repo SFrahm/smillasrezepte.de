@@ -231,7 +231,7 @@ document.getElementById('recipe-detail-overlay').addEventListener('click', (even
 
 document.getElementById('search-input').addEventListener('input', filterRecipes);
 document.getElementById('filter-btn').addEventListener('click', () => {
-    document.getElementById('filter-overlay').style.display = 'block';
+    document.getElementById('filter-overlay').style.display = 'flex';
 });
 
 document.getElementById('apply-filters').addEventListener('click', applyFilters);
