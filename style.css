@@ -64,29 +64,16 @@ header {
         flex-direction: column;
         align-items: stretch;
     }
-    #search-input {
-        width: 100%;
-        border-radius: 10px;
-        margin-bottom: 10px;
-    }
-    #filter-btn {
-        width: 100%;
-        border-radius: 10px;
-        margin-bottom: 10px;
-    }
-    #add-recipe-btn {
-        width: 100%;
-        margin-left: 0;
-        border-radius: 10px;
-        margin-bottom: 10px;
-    }
-
+    #search-input,
+    #filter-btn,
+    #add-recipe-btn,
     #trash-btn {
         width: 100%;
-        margin-left: 0;
+        margin: 0;
         border-radius: 10px;
         margin-bottom: 10px;
-    }
+        box-sizing: border-box;
+}
 
     .recipe-grid {
         grid-template-columns: 1fr;
