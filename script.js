@@ -293,7 +293,7 @@ const savoryEmojis = [
 ];
 
 const sweetEmojis = [
-    '🍰','🥧','🍩','🍪','🍫','🍮','🍦', '🧇', '🥞',
+    '🍰','🥧','🍩','🍪','🍫','🍮','🍦', '🧇', '🥞'
 ];
 
 let emojiMode = 'ai';
@@ -418,12 +418,18 @@ const emojiKeywords = {
     '🍜': ['ramen', 'pho', 'nudelsuppe', 'miso'],
     '🥘': ['pfanne', 'wok', 'paella', 'risotto'],
     '🍛': ['curry', 'dhal', 'indisch'],
-    '🌮': ['taco', 'burrito', 'tortilla'],
-    '🥙': ['wrap', 'falafel', 'pita'],
-    '�': ['sandwich', 'wrap', 'belegtes', 'snack'],
+    '🌮': ['taco', 'tortilla'], 
+    '🌯': ['burrito', 'wrap'],
+    '🥙': ['döner', 'falafel', 'pita'],
+    '🧆': ['falafel', 'bällchen', 'taler'],
+    '🥪': ['sandwich', 'wrap', 'belegtes', 'snack'],
     '🥐': ['croissant', 'blätterteig', 'hörnchen'],
     '🥖': ['brot', 'baguette'],
-    '🥞': ['pancake', 'pfannkuchen', 'crêpe', 'waffel'],
+    '🥞': ['pancake', 'pfannkuchen', 'crêpe',],
+    '🍮': ['pudding', 'flan', 'creme'],
+    '🥧': ['pie', 'apfelkuchen', 'tarte', 'quiche', 'blätterteig'],
+    '🧇': ['waffel'],
+    '🍽': ['gericht', 'essen', 'mahlzeit', 'food'],
     '🍰': ['kuchen', 'torte', 'tarte', 'dessert'],
     '🍩': ['donut', 'krapfen'],
     '🍪': ['keks', 'cookie', 'plätzchen'],
