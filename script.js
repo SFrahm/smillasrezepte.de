@@ -484,7 +484,7 @@ async function saveRecipe() {
     const size = document.getElementById('recipe-size').value;
     const tags = document.getElementById('recipe-tags').value.split(',');
 
-    if (!name || !description || !instructions || !calories || !protein || !category || meal.length === 0 || !size) {
+    if (!name || !instructions || !calories || !protein || !category || meal.length === 0 || !size) {
         alert('Bitte alle erforderlichen Felder ausfüllen und mindestens eine Mahlzeit auswählen!');
         return;
     }

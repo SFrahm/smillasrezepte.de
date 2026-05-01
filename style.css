@@ -265,13 +265,14 @@ header {
         border: none;
         color: #666;
         font-size: 16px;
+        font-family: Georgia, serif;
         cursor: pointer;
         padding: 4px 6px;
         box-shadow: none;
         border-radius: 6px;
         transition: color 0.15s, background 0.15s;
         flex-shrink: 0;
-    }
+}
 
     .delete-btn:hover,
     .edit-btn:hover {
