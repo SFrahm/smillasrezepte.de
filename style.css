@@ -118,7 +118,7 @@ header {
     letter-spacing: 0.02em;
 }
 
-#filter-popup label {
+#filter-popup .filter-section > label {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -127,6 +127,17 @@ header {
     color: #e8f7ff;
     font-family: 'Georgia', serif;
 }
+
+/* Accordion komplett isoliert */
+#filter-popup .accordion-content label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0;
+    margin-bottom: 0;
+}
+
+/* WICHTIG: kein globales label mehr */
 
 #filter-popup input[type="checkbox"] {
     width: 18px;
@@ -869,3 +880,103 @@ input:focus, select:focus, textarea:focus {
 #add-recipe-form .popup-actions button:first-child {
     margin-right: 0;
 }
+
+
+
+
+
+
+
+
+
+/* =========================
+   ACCORDION BASE (FIXED & ISOLATED)
+   ========================= */
+
+.accordion-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* GROUP */
+.accordion-group {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* HEADER */
+.accordion-header {
+    padding: 10px 12px;
+    background: #2a2a2a;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.accordion-header:hover {
+    background: #3a3a3a;
+}
+
+/* CONTENT WRAPPER */
+.accordion-content {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px 12px;
+    background: #2a2a2a;
+}
+
+.accordion-content.open {
+    display: flex;
+}
+
+/* =========================
+   FILTER-SAFE LABEL SYSTEM
+   (NO GLOBAL SIDE EFFECTS)
+   ========================= */
+
+.accordion-content label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* hide checkbox safely (NO layout breaking) */
+.accordion-content label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+/* pill style */
+.accordion-content label span {
+    flex: 1;
+    display: block;
+
+    padding: 8px 10px;
+    border-radius: 8px;
+
+    background: rgba(255,255,255,0.04);
+    color: #ddd;
+
+    transition: 0.15s;
+}
+
+/* hover */
+.accordion-content label:hover span {
+    background: rgba(0, 188, 212, 0.15);
+}
+
+/* checked state */
+.accordion-content label input[type="checkbox"]:checked + span {
+    background: #00bcd4;
+    color: #0b0b0b;
+    font-weight: 600;
+}
+

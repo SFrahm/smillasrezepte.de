@@ -31,46 +31,52 @@
         <button id="add-recipe-btn">+ Neues Rezept</button>
         <button id="trash-btn">🗑️</button>
     </div>
-
+    
     <div id="filter-overlay">
         <div id="filter-popup">
             <h3>Filter</h3>
+
             <div class="filter-section">
                 <h4>Kalorien</h4>
                 <input type="number" id="min-calories" placeholder="Min">
                 <input type="number" id="max-calories" placeholder="Max">
             </div>
+
             <div class="filter-section">
                 <h4>Proteine (g)</h4>
                 <input type="number" id="min-protein" placeholder="Min">
                 <input type="number" id="max-protein" placeholder="Max">
             </div>
+
             <div class="filter-section">
                 <h4>Kategorie</h4>
                 <label><input type="checkbox" value="süß" class="category-filter"> Süß</label>
                 <label><input type="checkbox" value="herzhaft" class="category-filter"> Herzhaft</label>
             </div>
+
+            <!-- ACCORDION (Mahlzeiten) -->
             <div class="filter-section">
-                <h4>Mahlzeit</h4>
-                <label><input type="checkbox" value="Frühstück" class="meal-filter"> Frühstück</label>
-                <label><input type="checkbox" value="Mittagessen" class="meal-filter"> Mittagessen</label>
-                <label><input type="checkbox" value="Abendessen" class="meal-filter"> Abendessen</label>
-                <label><input type="checkbox" value="Snack" class="meal-filter"> Snack</label>
+                <h4>Mahlzeiten</h4>
+                <div class="accordion-container" id="meal-accordion"></div>
             </div>
+
             <div class="filter-section">
                 <h4>Größe</h4>
                 <label><input type="checkbox" value="klein" class="size-filter"> Klein</label>
                 <label><input type="checkbox" value="mittel" class="size-filter"> Mittel</label>
                 <label><input type="checkbox" value="groß" class="size-filter"> Groß</label>
             </div>
+
             <div class="filter-section">
                 <h4>Zutaten</h4>
                 <input type="text" id="ingredients-input" placeholder="Zutaten durch Komma trennen">
             </div>
+
             <div class="popup-actions">
                 <button id="apply-filters">Anwenden</button>
                 <button id="close-filter">Schließen</button>
             </div>
+
         </div>
     </div>
 
@@ -148,13 +154,118 @@
                     <option value="herzhaft">Herzhaft</option>
                 </select>
             </div>
+           
             <div class="form-group">
-                <label>Mahlzeit (mehrere auswählbar)</label>
-                <div class="checkbox-list">
-                    <label><input type="checkbox" value="Frühstück" class="meal-checkbox"> Frühstück</label>
-                    <label><input type="checkbox" value="Mittagessen" class="meal-checkbox"> Mittagessen</label>
-                    <label><input type="checkbox" value="Abendessen" class="meal-checkbox"> Abendessen</label>
-                    <label><input type="checkbox" value="Snack" class="meal-checkbox"> Snack</label>
+                <label>Mahlzeit</label>
+
+                <div id="recipe-accordion" class="accordion-container">
+
+                    <div class="accordion-group">
+                        <div class="accordion-header">Snacks</div>
+                        <div class="accordion-content">
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Dessert">
+                                <span>Dessert</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Gebäck / Kuchen">
+                                <span>Gebäck / Kuchen</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Eis">
+                                <span>Eis</span>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <div class="accordion-group">
+                        <div class="accordion-header">Hauptspeisen</div>
+                        <div class="accordion-content">
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Nudelgerichte">
+                                <span>Nudelgerichte</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Kartoffelgerichte">
+                                <span>Kartoffelgerichte</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Reisgerichte">
+                                <span>Reisgerichte</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Currygerichte">
+                                <span>Currygerichte</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Pfannengerichte">
+                                <span>Pfannengerichte</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Ofengerichte">
+                                <span>Ofengerichte</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Aufläufe">
+                                <span>Aufläufe</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Suppen">
+                                <span>Suppen</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Salate">
+                                <span>Salate</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Wraps / Sandwiches">
+                                <span>Wraps / Sandwiches</span>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <div class="accordion-group">
+                        <div class="accordion-header">Basen & Zusätze</div>
+                        <div class="accordion-content">
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Dips">
+                                <span>Dips</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Saucen">
+                                <span>Saucen</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Dressings">
+                                <span>Dressings</span>
+                            </label>
+
+                            <label>
+                                <input type="checkbox" name="meal" value="Teigbasen">
+                                <span>Teigbasen</span>
+                            </label>
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div class="form-group">

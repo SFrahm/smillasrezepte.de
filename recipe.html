@@ -29,8 +29,8 @@
         document.getElementById('recipe-calories').textContent = urlParams.get('calories');
         document.getElementById('recipe-protein').textContent = urlParams.get('protein');
         document.getElementById('recipe-category').textContent = urlParams.get('category');
-        const meals = JSON.parse(urlParams.get('meal'));
-        document.getElementById('recipe-meal').textContent = Array.isArray(meals) ? meals.join(', ') : meals;
+        const meal = urlParams.get('meal');
+        document.getElementById('recipe-meal').textContent = meal || '';
         document.getElementById('recipe-size').textContent = urlParams.get('size');
         document.getElementById('recipe-instructions').textContent = urlParams.get('instructions');
         const ingredients = urlParams.get('ingredients').split(',');

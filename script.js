@@ -269,7 +269,7 @@ function applyFilters() {
         return recipe.calories >= minCalories && recipe.calories <= maxCalories &&
                recipe.protein >= minProtein && recipe.protein <= maxProtein &&
                (selectedCategories.length === 0 || selectedCategories.includes(recipe.category)) &&
-               (selectedMeals.length === 0 || selectedMeals.some(m => recipe.meal.includes(m))) &&
+               (selectedMeals.length === 0 || selectedMeals.includes(recipe.meal)) &&
                (selectedSizes.length === 0 || selectedSizes.includes(recipe.size)) &&
                (ingredients.length === 0 || ingredients.every(ing => recipe.tags.some(tag => tag.toLowerCase().includes(ing))));
     });
@@ -480,7 +480,7 @@ async function saveRecipe() {
     const calories = parseInt(document.getElementById('recipe-calories').value);
     const protein = parseInt(document.getElementById('recipe-protein').value);
     const category = document.getElementById('recipe-category').value;
-    const meal = Array.from(document.querySelectorAll('.meal-checkbox:checked')).map(cb => cb.value);
+    const meal = document.querySelector('input[name="meal"]:checked')?.value || null;
     const size = document.getElementById('recipe-size').value;
     const tags = document.getElementById('recipe-tags').value.split(',');
 
@@ -548,9 +548,8 @@ function fillForm(recipe) {
     document.getElementById('recipe-category').value = recipe.category || 'süß';
     document.getElementById('recipe-size').value = recipe.size || 'klein';
     document.getElementById('recipe-tags').value = Array.isArray(recipe.tags) ? recipe.tags.join(', ') : (recipe.tags || '');
-    document.querySelectorAll('.meal-checkbox').forEach(cb => {
-        const mealValues = Array.isArray(recipe.meal) ? recipe.meal : [recipe.meal];
-        cb.checked = mealValues.includes(cb.value);
+    document.querySelectorAll('input[name="meal"]').forEach(cb => {
+        cb.checked = (recipe.meal === cb.value);
     });
 
     const preview = document.getElementById('recipe-image-preview');
@@ -606,6 +605,108 @@ function resetForm() {
     preview.style.display = 'none';
 }
 
+const mealStructure = [
+  {
+    group: "Snacks",
+    items: ["Dessert", "Gebäck / Kuchen", "Eis"]
+  },
+  {
+    group: "Hauptspeisen",
+    items: [
+      "Nudelgerichte",
+      "Kartoffelgerichte",
+      "Reisgerichte",
+      "Currygerichte",
+      "Pfannengerichte",
+      "Ofengerichte",
+      "Aufläufe",
+      "Suppen",
+      "Salate",
+      "Wraps / Sandwiches"
+    ]
+  },
+  {
+    group: "Basen & Zusätze",
+    items: ["Dips", "Saucen", "Dressings", "Teigbasen"]
+  }
+];
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    function initAccordion(containerId, structure) {
+        const container = document.getElementById(containerId);
+
+        structure.forEach(section => {
+
+            const group = document.createElement("div");
+            group.className = "accordion-group";
+
+            const title = document.createElement("div");
+            title.className = "accordion-header";
+            title.textContent = section.group;
+
+            const list = document.createElement("div");
+            list.className = "accordion-content";
+
+            section.items.forEach(item => {
+                const label = document.createElement("label");
+
+                label.innerHTML = `
+                    <input type="checkbox" name="meal" value="${item}">
+                    <span>${item}</span>
+                `;
+
+                list.appendChild(label);
+            });
+
+            group.appendChild(title);
+            group.appendChild(list);
+            container.appendChild(group);
+        });
+    }
+
+    // FILTER (multi select)
+    initAccordion("meal-accordion", mealStructure);
+
+    // RECIPE (single select behavior)
+    if (typeof recipeStructure !== "undefined") {
+        initAccordion("recipe-accordion", recipeStructure);
+    }
+
+    // =========================
+    // ACCORDION OPEN/CLOSE
+    // =========================
+
+    document.addEventListener("click", (e) => {
+        const header = e.target.closest(".accordion-header");
+        if (!header) return;
+
+        const content = header.nextElementSibling;
+        content.classList.toggle("open");
+    });
+
+    // =========================
+    // RECIPE = ONLY ONE SELECTED
+    // =========================
+
+    document.addEventListener("change", (e) => {
+
+        // nur recipe-accordion einschränken
+        if (
+            e.target.matches('#recipe-accordion input[type="checkbox"][name="meal"]')
+        ) {
+            document
+                .querySelectorAll('#recipe-accordion input[type="checkbox"][name="meal"]')
+                .forEach(cb => {
+                    if (cb !== e.target) cb.checked = false;
+                });
+        }
+    });
+
+});
 // Sicherstellen dass Overlay und Formular beim Start sauber sind
 document.getElementById('add-recipe-overlay').style.display = 'none';
 resetForm();
