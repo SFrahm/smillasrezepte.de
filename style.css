@@ -984,18 +984,23 @@ input:focus, select:focus, textarea:focus {
 }
 
 .meal-section {
-    width: 100%;
+    margin-bottom: 42px;
 }
 
 .meal-heading {
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0 0 12px;
-    color: #ffffff;
-    border-left: 4px solid #00bcd4;
-    padding-left: 10px;
-}
+    font-size: 17px;
+    font-weight: 600;
 
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    color: #00bcd4;
+
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
 .meal-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
