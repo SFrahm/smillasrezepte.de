@@ -346,54 +346,107 @@ document.getElementById('trash-overlay').addEventListener('click', (e) => {
 
 const savoryEmojis = [
     '🍕','🍔','🥪','🌮','🌯','🥙','🧆','🥗',
-    '🥖','🥐','🥟','🥘','🍲','🍛','🍜','🍝',
+    '🧀','🥩','🍳','🥘','🍲','🍛','🍜','🍝',
+    '🥖','🥟', '🥫'
 ];
 
 const sweetEmojis = [
-    '🍰','🥧','🍩','🍪','🍫','🍮','🍦', '🧇', '🥞'
+    '🍰','🥧','🥐','🍪','🍮','🍦', 
+    '🧇','🥞','🍫'
+];
+
+const fruitVeggieEmojis = [
+    '🥒','🥕','🥔','🍠','🍎','🍉', '🥥', '🍌'
 ];
 
 let emojiMode = 'ai';
-
 function buildEmojiPicker() {
     const picker = document.getElementById('emoji-picker');
     picker.innerHTML = '';
 
+    // HERZHAFT
     const savoryRow = document.createElement('div');
     savoryRow.className = 'emoji-row';
+
     savoryEmojis.forEach(emoji => {
         const btn = document.createElement('button');
+
         btn.type = 'button';
         btn.className = 'emoji-option';
         btn.textContent = emoji;
+
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+
             selectEmoji(emoji);
-            document.querySelectorAll('#emoji-picker .emoji-option').forEach(b => b.classList.remove('selected'));
+
+            document
+                .querySelectorAll('#emoji-picker .emoji-option')
+                .forEach(b => b.classList.remove('selected'));
+
             btn.classList.add('selected');
         });
+
         savoryRow.appendChild(btn);
     });
 
+    // SÜSS
     const sweetRow = document.createElement('div');
     sweetRow.className = 'emoji-row';
+
     sweetEmojis.forEach(emoji => {
         const btn = document.createElement('button');
+
         btn.type = 'button';
         btn.className = 'emoji-option';
         btn.textContent = emoji;
+
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+
             selectEmoji(emoji);
-            document.querySelectorAll('#emoji-picker .emoji-option').forEach(b => b.classList.remove('selected'));
+
+            document
+                .querySelectorAll('#emoji-picker .emoji-option')
+                .forEach(b => b.classList.remove('selected'));
+
             btn.classList.add('selected');
         });
+
         sweetRow.appendChild(btn);
+    });
+
+    // OBST & GEMÜSE
+    const fruitRow = document.createElement('div');
+    fruitRow.className = 'emoji-row';
+
+    fruitVeggieEmojis.forEach(emoji => {
+        const btn = document.createElement('button');
+
+        btn.type = 'button';
+        btn.className = 'emoji-option';
+        btn.textContent = emoji;
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            selectEmoji(emoji);
+
+            document
+                .querySelectorAll('#emoji-picker .emoji-option')
+                .forEach(b => b.classList.remove('selected'));
+
+            btn.classList.add('selected');
+        });
+
+        fruitRow.appendChild(btn);
     });
 
     picker.appendChild(savoryRow);
     picker.appendChild(sweetRow);
+    picker.appendChild(fruitRow);
 }
+
 buildEmojiPicker();
 
 function selectEmoji(emoji) {
@@ -493,6 +546,17 @@ const emojiKeywords = {
     '🍫': ['schoko', 'brownie', 'mousse', 'kakao'],
     '🍦': ['eis', 'sorbet', 'frozen'],
     '🥟': ['dumpling', 'teigtasche', 'gyoza'],
+    '🍎': ['apfel', 'obst', 'frucht'],
+    '🥒': ['gurke', 'salat', 'gemüse'],
+    '🥕': ['karotte', 'möhre', 'gemüse'],
+    '🥔': ['kartoffel', 'pommes', 'püree', 'ofenkartoffel'],
+    '🥫': ['sauce', 'soße', 'eintopf'],
+    '🍉': ['wassermelone', 'obst', 'frucht'],
+    '🥥': ['kokos', 'cocos',],
+    '🥩': ['steak', 'fleisch', 'schnitzel'],
+    '🍳': ['ei', 'omelett', 'rührei', 'spiegelei'],
+    '🧀': ['käse', 'cheese', 'mozzarella', 'parmesan', 'feta'],
+    '🍠': ['süßkartoffel', 'ofenkartoffel', 'sweetpotato']
 };
 
 function suggestEmojis(name) {
