@@ -230,53 +230,73 @@ document.getElementById('recipe-detail-overlay').addEventListener('click', (even
 });
 
 document.getElementById('search-input').addEventListener('input', filterRecipes);
+
 document.getElementById('filter-btn').addEventListener('click', () => {
     document.getElementById('filter-overlay').style.display = 'flex';
 });
-
 document.getElementById('apply-filters').addEventListener('click', applyFilters);
-document.getElementById('close-filter').addEventListener('click', () => {
-    document.getElementById('filter-overlay').style.display = 'none';
-});
+document.getElementById('close-filter').addEventListener('click', closeFilter);
 
 document.getElementById('filter-overlay').addEventListener('click', (event) => {
     if (event.target.id === 'filter-overlay') {
-        document.getElementById('filter-overlay').style.display = 'none';
+        closeFilter();
     }
 });
 
-function filterRecipes() {
-    const query = document.getElementById('search-input').value.toLowerCase();
-    filteredRecipes = recipes.filter(recipe =>
-        recipe.name.toLowerCase().includes(query) ||
-        recipe.description.toLowerCase().includes(query) ||
-        recipe.ingredients.some(ing => ing.toLowerCase().includes(query))
-    );
-    displayRecipes(filteredRecipes);
+function closeFilter() {
+    document.getElementById('filter-overlay').style.display = 'none';
 }
 
+function filterRecipes() {
+    applyFilters();
+} 
 function applyFilters() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+
     const minCalories = parseInt(document.getElementById('min-calories').value) || 0;
     const maxCalories = parseInt(document.getElementById('max-calories').value) || Infinity;
     const minProtein = parseInt(document.getElementById('min-protein').value) || 0;
     const maxProtein = parseInt(document.getElementById('max-protein').value) || Infinity;
+
     const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.value);
     const selectedMeals = Array.from(document.querySelectorAll('.meal-filter:checked')).map(cb => cb.value);
     const selectedSizes = Array.from(document.querySelectorAll('.size-filter:checked')).map(cb => cb.value);
-    const ingredients = document.getElementById('ingredients-input').value.toLowerCase().split(',').map(i => i.trim()).filter(i => i);
+
+    const ingredients = document.getElementById('ingredients-input').value
+        .toLowerCase()
+        .split(',')
+        .map(i => i.trim())
+        .filter(i => i);
 
     filteredRecipes = recipes.filter(recipe => {
-        return recipe.calories >= minCalories && recipe.calories <= maxCalories &&
-               recipe.protein >= minProtein && recipe.protein <= maxProtein &&
-               (selectedCategories.length === 0 || selectedCategories.includes(recipe.category)) &&
-               (selectedMeals.length === 0 || selectedMeals.includes(recipe.meal)) &&
-               (selectedSizes.length === 0 || selectedSizes.includes(recipe.size)) &&
-               (ingredients.length === 0 || ingredients.every(ing => recipe.tags.some(tag => tag.toLowerCase().includes(ing))));
-    });
-    displayRecipes(filteredRecipes);
-    document.getElementById('filter-popup').style.display = 'none';
-}
 
+        // 🔥 SEARCH bleibt erhalten
+        const matchesSearch =
+            !query ||
+            recipe.name.toLowerCase().includes(query) ||
+            recipe.description.toLowerCase().includes(query) ||
+            recipe.ingredients.some(ing => ing.toLowerCase().includes(query));
+
+        return (
+            matchesSearch &&
+            recipe.calories >= minCalories &&
+            recipe.calories <= maxCalories &&
+            recipe.protein >= minProtein &&
+            recipe.protein <= maxProtein &&
+            (selectedCategories.length === 0 || selectedCategories.includes(recipe.category)) &&
+            (selectedMeals.length === 0 || selectedMeals.includes(recipe.meal)) &&
+            (selectedSizes.length === 0 || selectedSizes.includes(recipe.size)) &&
+            (ingredients.length === 0 || ingredients.every(ing =>
+                recipe.tags.some(tag => tag.toLowerCase().includes(ing))
+            ))
+        );
+    });
+
+    displayRecipes(filteredRecipes);
+
+    // Overlay sauber schließen
+    closeFilter();
+}
 document.getElementById('add-recipe-btn').addEventListener('click', () => openRecipeForm());
 
 document.getElementById('trash-btn').addEventListener('click', displayTrash);
@@ -707,6 +727,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
 // Sicherstellen dass Overlay und Formular beim Start sauber sind
 document.getElementById('add-recipe-overlay').style.display = 'none';
 resetForm();
