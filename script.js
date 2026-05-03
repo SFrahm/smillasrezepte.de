@@ -158,33 +158,70 @@ function imgHtml(recipe, type) {
     const cls = type === 'card' ? 'card-no-image' : 'detail-no-image';
     return `<div class="${cls}">${emoji}</div>`;
 }
-
 function displayRecipes(recipesToDisplay) {
     const container = document.getElementById('recipes-grid');
     container.innerHTML = '';
+
+    const grouped = {
+        "Hauptspeisen": [],
+        "Snacks": [],
+        "Basen & Zusätze": [],
+        "Unsortiert": []
+    };
+
     recipesToDisplay.forEach(recipe => {
-        const card = document.createElement('div');
-        card.className = 'recipe-card';
-        card.innerHTML = `
-            ${imgHtml(recipe, 'card')}
-            <div class="card-bottom">
-                <h3>${recipe.name}</h3>
-                <div class="card-actions">
-                    <button class="edit-btn" title="Bearbeiten">✏️</button>
-                    <button class="delete-btn" title="Löschen">🗑️</button>
+        const mealValue = Array.isArray(recipe.meal) ? recipe.meal[0] : recipe.meal;
+        const group = mealToGroup[mealValue] || "Unsortiert";
+        grouped[group].push(recipe);
+    });
+
+    mealOrder.forEach(group => {
+        const recipes = grouped[group];
+        if (!recipes.length) return;
+
+        const section = document.createElement('div');
+        section.className = 'meal-section';
+
+        const heading = document.createElement('h2');
+        heading.className = 'meal-heading';
+        heading.textContent = group;
+
+        const grid = document.createElement('div');
+        grid.className = 'meal-grid';
+
+        recipes.forEach(recipe => {
+            const card = document.createElement('div');
+            card.className = 'recipe-card';
+
+            card.innerHTML = `
+                ${imgHtml(recipe, 'card')}
+                <div class="card-bottom">
+                    <h3>${recipe.name}</h3>
+                    <div class="card-actions">
+                        <button class="edit-btn" title="Bearbeiten">✏️</button>
+                        <button class="delete-btn" title="Löschen">🗑️</button>
+                    </div>
                 </div>
-            </div>
-        `;
-        card.querySelector('.edit-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            openRecipeForm(recipe);
+            `;
+
+            card.querySelector('.edit-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openRecipeForm(recipe);
+            });
+
+            card.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteRecipe(recipe);
+            });
+
+            card.addEventListener('click', () => showRecipeDetail(recipe));
+
+            grid.appendChild(card);
         });
-        card.querySelector('.delete-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteRecipe(recipe);
-        });
-        card.addEventListener('click', () => showRecipeDetail(recipe));
-        container.appendChild(card);
+
+        section.appendChild(heading);
+        section.appendChild(grid);
+        container.appendChild(section);
     });
 }
 
@@ -651,7 +688,14 @@ const mealStructure = [
   }
 ];
 
+const mealOrder = ["Hauptspeisen", "Snacks", "Basen & Zusätze"];
 
+const mealToGroup = {};
+mealStructure.forEach(section => {
+    section.items.forEach(item => {
+        mealToGroup[item] = section.group;
+    });
+});
 
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -72,10 +72,6 @@ header {
         border-radius: 10px;
         box-sizing: border-box;
 }
-
-    .recipe-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 #filter-overlay {
@@ -199,11 +195,7 @@ header {
     padding: 20px;
 }
 
-.recipe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
+
 
 .recipe-card {
     background: linear-gradient(160deg, #2f2f2f 0%, #232323 100%);
@@ -984,3 +976,40 @@ input:focus, select:focus, textarea:focus {
     font-weight: 600;
 }
 
+#recipes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+    width: 100%;
+}
+
+.meal-section {
+    width: 100%;
+}
+
+.meal-heading {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: #ffffff;
+    border-left: 4px solid #00bcd4;
+    padding-left: 10px;
+}
+
+.meal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+    align-items: start;
+}
+
+.meal-grid .recipe-card {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .meal-grid {
+        grid-template-columns: 1fr;
+    }
+}
