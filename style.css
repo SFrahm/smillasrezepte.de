@@ -520,6 +520,10 @@ header {
     margin: 0;
 }
 
+#recipe-detail-content p {
+    white-space: pre-line;
+}
+
 .recipe-detail {
     background-color: #f9f9f9;
     padding: 20px;
