@@ -563,10 +563,17 @@ header {
     margin-bottom: 16px;
 }
 
-.form-group label {
+#add-recipe-form .form-group label {
     display: block;
-    margin-bottom: 8px;
-    color: #e8f7ff;
+    margin-bottom: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #00d6f7;
+
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .form-group input, .form-group select, .form-group textarea {
@@ -693,11 +700,7 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 16px;
 }
 
-#add-recipe-form .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #e8f7ff;
-}
+
 
 #add-recipe-form .checkbox-list label {
     display: flex;
