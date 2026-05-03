@@ -675,7 +675,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const label = document.createElement("label");
 
                 label.innerHTML = `
-                    <input type="checkbox" name="meal" value="${item}">
+                    <input type="checkbox" class="meal-filter" value="${item}">
                     <span>${item}</span>
                 `;
 
