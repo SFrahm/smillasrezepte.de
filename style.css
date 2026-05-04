@@ -1141,12 +1141,78 @@ body:not(.admin) #add-recipe-btn {
 }
 
 #login-overlay .modal #login-close {
-    background-color: #00bcd4;
-    border: 1px solid #00bcd4;
+    background-color: #00d6f7;
+    border: 1px solid #00d6f7;
     color: #ffffff !important;
 }
 
 #login-overlay .modal button:hover {
     background-color: rgba(0, 188, 212, 0.12) !important;
     border-color: #00d6f7 !important;
+}
+
+#logout-overlay {
+    display: none;
+}
+
+#logout-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    z-index: 9999;
+
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#logout-overlay .modal {
+    width: 100%;
+    max-width: 360px;
+
+    background: linear-gradient(160deg, #242424 0%, #1a1a1a 100%);
+    border: 1px solid rgba(0, 188, 212, 0.2);
+    border-radius: 24px;
+    padding: 22px;
+
+    box-shadow:
+        0 32px 80px rgba(0,0,0,0.65),
+        0 8px 24px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+
+    font-family: Georgia, serif;
+    color: #00d6f7;
+}
+
+#logout-overlay .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 16px;
+}
+
+#logout-overlay p {
+    color: #ffffff;
+}
+
+#logout-overlay button {
+    padding: 10px 14px;
+    border-radius: 14px;
+
+    background-color: #292929;
+    border: 1px solid rgba(0, 188, 212, 0.3);
+
+    color: #fff ;
+    font-family: Georgia, serif;
+    font-size: 15px;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#logout-overlay button:hover {
+    background-color: rgb(255, 255, 255);
+    border-color: #00d6f7;
 }

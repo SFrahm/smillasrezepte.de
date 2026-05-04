@@ -873,8 +873,29 @@ function login() {
 function logout() {
     firebase.auth().signOut();
 }
+function openLogout() {
+    document.getElementById("logout-overlay").style.display = "flex";
+}
+
+document.getElementById("logout-btn").addEventListener("click", openLogout);
+
+document.getElementById("logout-confirm").addEventListener("click", () => {
+    firebase.auth().signOut();
+    document.getElementById("logout-overlay").style.display = "none";
+});
+
+document.getElementById("logout-cancel").addEventListener("click", () => {
+    document.getElementById("logout-overlay").style.display = "none";
+});
+
+// Klick außerhalb schließt auch
+document.getElementById("logout-overlay").addEventListener("click", (e) => {
+    if (e.target.id === "logout-overlay") {
+        e.target.style.display = "none";
+    }
+});
+
 document.getElementById("login-btn").addEventListener("click", login);
-document.getElementById("logout-btn").addEventListener("click", logout);
 
 function applyAuthUI(user) {
     const isLoggedIn = !!user;
@@ -908,6 +929,14 @@ document.getElementById("login-form").addEventListener("submit", (e) => {
 
 document.getElementById("login-close").addEventListener("click", () => {
     document.getElementById("login-overlay").style.display = "none";
+});
+
+const loginOverlay = document.getElementById("login-overlay");
+
+loginOverlay.addEventListener("click", (e) => {
+    if (e.target === loginOverlay) {
+        loginOverlay.style.display = "none";
+    }
 });
 
 
