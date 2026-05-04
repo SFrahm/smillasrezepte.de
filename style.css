@@ -44,6 +44,7 @@ header {
     border-radius: 0 10px 10px 0;
     cursor: pointer;
     height: 40px;
+    font-family: 'Georgia', serif;
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -53,8 +54,10 @@ header {
 #add-recipe-btn {
     padding: 10px 20px;
     background-color: #00bcd4;
+    font-family: 'Georgia', serif;
     color: white;
     border: none;
+    height: 40px;
     border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
@@ -305,6 +308,7 @@ header {
 
 #trash-btn {
     background: linear-gradient(145deg, #555, #3a3a3a);
+    height: 40px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3),
                 inset 0 1px 0 rgba(255,255,255,0.1);
 }
@@ -1034,4 +1038,25 @@ input:focus, select:focus, textarea:focus {
     .meal-grid {
         grid-template-columns: 1fr;
     }
+}
+
+body:not(.admin) .edit-btn,
+body:not(.admin) .delete-btn,
+body:not(.admin) #add-recipe-btn {
+    display: none;
+}
+
+.auth-btn {
+    font-size: 16px;
+    font-family: Georgia, serif;
+    padding: 8px 14px;
+    height: 40px;
+    background-color: #0d1f22;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.auth-btn:hover {
+    background-color: #1b3a3f;
 }

@@ -30,6 +30,8 @@
         <button id="filter-btn">Filter</button>
         <button id="add-recipe-btn">+ Neues Rezept</button>
         <button id="trash-btn">🗑️</button>
+        <button class="auth-btn" id="login-btn">🔒</button>
+        <button class="auth-btn" id="logout-btn">🔓</button>
     </div>
     
     <div id="filter-overlay">
@@ -287,8 +289,10 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="script.js"></script>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

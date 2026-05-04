@@ -4,6 +4,10 @@ let trash = [];
 let selectedImageDataUrl = '';
 let activeRecipeId = null;
 
+firebase.auth().onAuthStateChanged((user) => {
+    applyAuthUI(user);
+});
+
 const TRASH_TTL = 5 * 24 * 60 * 60 * 1000;
 
 function saveToLocalStorage() {
@@ -22,6 +26,10 @@ function cleanupTrash() {
 }
 
 function deleteRecipe(recipe) {
+    if (!firebase.auth().currentUser) {
+    alert("Bitte einloggen!");
+    return;
+    }
     recipes = recipes.filter(r => r.id !== recipe.id);
     filteredRecipes = filteredRecipes.filter(r => r.id !== recipe.id);
     trash.push({ ...recipe, deletedAt: Date.now() });
@@ -32,6 +40,10 @@ function deleteRecipe(recipe) {
 }
 
 function restoreRecipe(recipe) {
+    if (!firebase.auth().currentUser) {
+    alert("Bitte einloggen!");
+    return;
+    }
     trash = trash.filter(r => r.id !== recipe.id);
     const { deletedAt, ...clean } = recipe;
     recipes.push(clean);
@@ -223,8 +235,8 @@ function displayRecipes(recipesToDisplay) {
         section.appendChild(grid);
         container.appendChild(section);
     });
+    applyAuthUI(firebase.auth().currentUser);
 }
-
 function showRecipeDetail(recipe) {
     const content = document.getElementById('recipe-detail-content');
     content.innerHTML = `
@@ -246,17 +258,21 @@ function showRecipeDetail(recipe) {
         <h4>Zubereitung</h4>
         <p>${recipe.instructions}</p>
     `;
+
     const detailEditButton = document.getElementById('detail-edit-btn');
+
     if (detailEditButton) {
+        detailEditButton.style.display = firebase.auth().currentUser ? "inline-block" : "none";
+
         detailEditButton.addEventListener('click', (e) => {
             e.stopPropagation();
             document.getElementById('recipe-detail-overlay').style.display = 'none';
             openRecipeForm(recipe);
         });
     }
+
     document.getElementById('recipe-detail-overlay').style.display = 'flex';
 }
-
 document.getElementById('close-detail').addEventListener('click', () => {
     document.getElementById('recipe-detail-overlay').style.display = 'none';
 });
@@ -593,6 +609,10 @@ document.getElementById('add-recipe-overlay').addEventListener('click', (event) 
 });
 
 async function saveRecipe() {
+    if (!firebase.auth().currentUser) {
+        alert("Bitte einloggen!");
+        return;
+    }
     const name = document.getElementById('recipe-name').value;
     const image = selectedImageDataUrl;
     const description = document.getElementById('recipe-description').value;
@@ -835,6 +855,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+function login() {
+    const email = prompt("Email:");
+    const password = prompt("Passwort:");
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => alert("Eingeloggt"))
+        .catch(err => alert(err.message));
+}
+
+function logout() {
+    firebase.auth().signOut();
+}
+document.getElementById("login-btn").addEventListener("click", login);
+document.getElementById("logout-btn").addEventListener("click", logout);
+
+function applyAuthUI(user) {
+    const isLoggedIn = !!user;
+
+    document.getElementById("add-recipe-btn").style.display =
+        isLoggedIn ? "block" : "none";
+
+    document.getElementById("login-btn").style.display =
+        isLoggedIn ? "none" : "inline-block";
+
+    document.getElementById("logout-btn").style.display =
+        isLoggedIn ? "inline-block" : "none";
+
+    document.querySelectorAll(".edit-btn, .delete-btn").forEach(btn => {
+        btn.style.display = isLoggedIn ? "inline-block" : "none";
+    });
+}
+
+
 
 // Sicherstellen dass Overlay und Formular beim Start sauber sind
 document.getElementById('add-recipe-overlay').style.display = 'none';
