@@ -8,7 +8,7 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+    background: linear-gradient(135deg, #00d6f7 0%, #0097a7 100%);
     color: white;
     padding: 20px;
     text-align: center;
@@ -38,7 +38,7 @@ header {
 
 #filter-btn {
     padding: 0 20px;
-    background-color: #00bcd4;
+    background-color:  #00d6f7;
     color: white;
     border: none;
     border-radius: 0 10px 10px 0;
@@ -53,7 +53,7 @@ header {
 
 #add-recipe-btn {
     padding: 10px 20px;
-    background-color: #00bcd4;
+    background-color:  #00d6f7;
     font-family: 'Georgia', serif;
     color: white;
     border: none;
@@ -140,7 +140,7 @@ header {
 #filter-popup input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #00bcd4;
+    accent-color: #00d6f7;
     margin: 0;
 }
 
@@ -186,6 +186,7 @@ header {
 #filter-popup button {
     flex: 1;
     min-width: 0;
+    font-family: Georgia, serif;
 }
 
 #ingredients-input {
@@ -316,11 +317,11 @@ header {
 #trash-btn:hover {
     background: linear-gradient(145deg, #666, #444);
 }
+
 #trash-overlay {
     display: none;
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    inset: 0;
     background: rgba(0,0,0,0.72);
     z-index: 1000;
     align-items: center;
@@ -330,93 +331,89 @@ header {
 }
 
 #trash-popup {
-    position: relative;
     width: min(480px, 94vw);
     max-height: 85vh;
     overflow-y: auto;
+
     background: linear-gradient(160deg, #242424 0%, #1a1a1a 100%);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(0, 188, 212, 0.2);
     border-radius: 24px;
     padding: 24px;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.06);
+
+    box-shadow:
+        0 32px 80px rgba(0,0,0,0.65),
+        0 8px 24px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+
     color: #fff;
+    font-family: Georgia, serif;
 }
 
+/* Titel */
 #trash-popup h3 {
-    margin: 0 0 4px;
-    color: #ccc;
+    margin: 0 0 12px;
     font-size: 22px;
+    color: #00d6f7;
 }
 
-.trash-hint {
-    color: #888;
-    font-size: 13px;
-    margin: 0 0 18px;
-}
-
-.trash-empty {
-    color: #666;
-    text-align: center;
-    padding: 20px 0;
-}
-
+/* Liste */
 .trash-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
+
     padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.trash-item:last-child { border-bottom: none; }
-
-.trash-item img, .trash-no-img {
-    width: 52px;
-    height: 52px;
-    object-fit: cover;
-    border-radius: 10px;
-    flex-shrink: 0;
+.trash-item:last-child {
+    border-bottom: none;
 }
 
-.trash-no-img {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    background: #2a2a2a;
-}
-
+/* linke Seite (Textblock) */
 .trash-item-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
 }
 
 .trash-item-name {
     font-size: 15px;
-    color: #eee;
+    color: #e8f7ff;
 }
 
 .trash-item-days {
     font-size: 12px;
-    color: #e07a5f;
+    color: #00d6f7;
+    opacity: 0.8;
 }
 
+#trash-overlay,
+#trash-overlay * {
+    font-family: Georgia, serif !important;
+}
+
+/* Restore Button */
 .restore-btn {
-    background: linear-gradient(145deg, #2a3d2a, #1e2e1e);
-    color: #7ecb7e;
-    border: 1px solid rgba(126,203,126,0.25);
-    font-size: 13px;
     padding: 6px 12px;
-    box-shadow: none;
-    flex-shrink: 0;
+    border-radius: 12px;
+
+    background: #292929;
+    border: 1px solid rgba(0, 188, 212, 0.3);
+    color: #00d6f7;
+
+    font-family: Georgia, serif;
+    font-size: 13px;
+
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .restore-btn:hover {
-    background: linear-gradient(145deg, #3a4d3a, #2a3e2a);
-    box-shadow: none;
-    transform: none;
+    background: rgba(0, 188, 212, 0.12);
+    border-color: #00d6f7;
 }
 
 #recipe-detail-overlay {
@@ -654,7 +651,7 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: #00bcd4;
+    border-color: #00d6f7;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.35), 0 0 0 2px rgba(0, 188, 212, 0.15);
 }
 
@@ -718,7 +715,7 @@ input:focus, select:focus, textarea:focus {
 #add-recipe-form .checkbox-list input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #00bcd4;
+    accent-color: #00d6f7;
     margin: 0;
 }
 
@@ -820,7 +817,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .emoji-ai-btn.selected {
-    border-color: #00bcd4;
+    border-color:  #00d6f7;
     background: rgba(0, 188, 212, 0.15);
     box-shadow: 0 0 0 1px rgba(0, 188, 212, 0.3), 0 4px 10px rgba(0,0,0,0.3);
 }
@@ -863,7 +860,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .emoji-option.selected {
-    border-color: #00bcd4;
+    border-color:  #00d6f7;
     background: rgba(0, 188, 212, 0.15);
     box-shadow: 0 0 0 1px rgba(0, 188, 212, 0.3);
 }
@@ -897,10 +894,6 @@ input:focus, select:focus, textarea:focus {
 #add-recipe-form .popup-actions button:first-child {
     margin-right: 0;
 }
-
-
-
-
 
 
 
@@ -992,7 +985,7 @@ input:focus, select:focus, textarea:focus {
 
 /* checked state */
 .accordion-content label input[type="checkbox"]:checked + span {
-    background: #00bcd4;
+    background: #00d6f7;
     color: #0b0b0b;
     font-weight: 600;
 }
@@ -1015,7 +1008,7 @@ input:focus, select:focus, textarea:focus {
     letter-spacing: 0.08em;
     text-transform: uppercase;
 
-    color: #00bcd4;
+    color:  #00d6f7;
 
     margin: 0 0 16px;
     padding-bottom: 8px;
@@ -1059,4 +1052,101 @@ body:not(.admin) #add-recipe-btn {
 
 .auth-btn:hover {
     background-color: #1b3a3f;
+}
+
+
+#login-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    z-index: 9999;
+
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* DAS ist der wichtige Teil (wie filter-popup) */
+#login-overlay .modal {
+    width: 100%;
+    max-width: 360px;
+    max-height: 82vh;
+    overflow-y: auto;
+
+    background: linear-gradient(160deg, #242424 0%, #1a1a1a 100%);
+    border: 1px solid rgba(0, 188, 212, 0.2);
+    padding: 22px;
+    border-radius: 24px;
+
+    box-shadow:
+        0 32px 80px rgba(0,0,0,0.65),
+        0 8px 24px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+
+    font-family: Georgia, serif;
+}
+
+/* Titel wie Filter */
+#login-overlay h2 {
+    margin: 0 0 18px;
+    font-size: 24px;
+    color: #00d6f7;
+    letter-spacing: 0.02em;
+}
+
+/* Inputs identisch zum Filter */
+#login-overlay input {
+    width: 100%;
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+
+    border: 1px solid #444;
+    background-color: #292929;
+    color: #ffffff;
+
+    box-sizing: border-box;
+    font-size: 15px;
+    font-family: Georgia, serif;
+}
+
+/* Buttons unten wie filter actions */
+#login-overlay .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+#login-overlay .modal button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 14px;
+    border-radius: 14px;
+
+    background-color: #292929 !important;
+    border: 1px solid rgba(0, 188, 212, 0.3) !important;
+
+    color: #00d6f7;
+
+    font-family: Georgia, serif;
+    font-size: 15px;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#login-overlay .modal #login-close {
+    background-color: #00bcd4;
+    border: 1px solid #00bcd4;
+    color: #ffffff !important;
+}
+
+#login-overlay .modal button:hover {
+    background-color: rgba(0, 188, 212, 0.12) !important;
+    border-color: #00d6f7 !important;
 }

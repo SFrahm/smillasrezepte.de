@@ -54,32 +54,42 @@ function restoreRecipe(recipe) {
     displayRecipes(filteredRecipes);
     displayTrash();
 }
-
 function displayTrash() {
     const container = document.getElementById('trash-list');
     container.innerHTML = '';
-    if (trash.length === 0) {
+
+    if (!trash.length) {
         container.innerHTML = '<p class="trash-empty">Papierkorb ist leer.</p>';
     } else {
         trash.forEach(recipe => {
-            const daysLeft = Math.ceil((TRASH_TTL - (Date.now() - recipe.deletedAt)) / (24 * 60 * 60 * 1000));
+            const daysLeft = Math.ceil(
+                (TRASH_TTL - (Date.now() - recipe.deletedAt)) /
+                (24 * 60 * 60 * 1000)
+            );
+
             const item = document.createElement('div');
             item.className = 'trash-item';
+
             item.innerHTML = `
-                ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.name}">` : '<div class="trash-no-img">🍽</div>'}
+
+
                 <div class="trash-item-info">
                     <span class="trash-item-name">${recipe.name}</span>
-                    <span class="trash-item-days">Noch ${daysLeft} Tag${daysLeft !== 1 ? 'e' : ''}</span>
+                    <span class="trash-item-days">Noch ${daysLeft} Tage</span>
                 </div>
-                <button class="restore-btn">Wiederherstellen</button>
+
+                <button>Wiederherstellen</button>
             `;
-            item.querySelector('.restore-btn').addEventListener('click', (e) => {
+
+            item.querySelector('button').addEventListener('click', (e) => {
                 e.stopPropagation();
                 restoreRecipe(recipe);
             });
+
             container.appendChild(item);
         });
     }
+
     document.getElementById('trash-overlay').style.display = 'flex';
 }
 
@@ -857,12 +867,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function login() {
-    const email = prompt("Email:");
-    const password = prompt("Passwort:");
-
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => alert("Eingeloggt"))
-        .catch(err => alert(err.message));
+    document.getElementById("login-overlay").style.display = "flex";
 }
 
 function logout() {
@@ -888,6 +893,22 @@ function applyAuthUI(user) {
     });
 }
 
+document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+            document.getElementById("login-overlay").style.display = "none";
+        })
+        .catch(err => alert(err.message));
+});
+
+document.getElementById("login-close").addEventListener("click", () => {
+    document.getElementById("login-overlay").style.display = "none";
+});
 
 
 // Sicherstellen dass Overlay und Formular beim Start sauber sind

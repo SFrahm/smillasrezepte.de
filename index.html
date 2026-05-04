@@ -30,8 +30,8 @@
         <button id="filter-btn">Filter</button>
         <button id="add-recipe-btn">+ Neues Rezept</button>
         <button id="trash-btn">🗑️</button>
-        <button class="auth-btn" id="login-btn">🔒</button>
-        <button class="auth-btn" id="logout-btn">🔓</button>
+        <button class="auth-btn" id="login-btn">🔑</button>
+        <button class="auth-btn" id="logout-btn">🔒</button>
     </div>
     
     <div id="filter-overlay">
@@ -286,6 +286,39 @@
                 <button id="cancel-recipe">Abbrechen</button>
             </div>
         </div>
+    </div>
+
+    <div id="login-overlay" class="overlay">
+    <div class="modal">
+
+        <form id="login-form">
+        <h2>Login</h2>
+
+        <input
+            type="email"
+            id="login-email"
+            name="email"
+            placeholder="E-Mail"
+            autocomplete="email"
+            required
+        >
+
+        <input
+            type="password"
+            id="login-password"
+            name="password"
+            placeholder="Passwort"
+            autocomplete="current-password"
+            required
+        >
+
+        <div class="modal-actions">
+            <button type="submit">🔑</button>
+            <button type="button" id="login-close">Abbrechen</button>
+        </div>
+        </form>
+
+    </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
