@@ -16,7 +16,20 @@ function saveToLocalStorage() {
 
 function saveTrash() {
     localStorage.setItem('smillas-trash', JSON.stringify(trash));
-    try { db.ref('trash').set(trash).catch(() => {}); } catch(e) {}
+
+    try {
+        db.ref('trash').set(trash)
+            .then(() => {
+                console.log("Trash gespeichert");
+            })
+            .catch((err) => {
+                console.error(err);
+                alert(err.message);
+            });
+
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 function cleanupTrash() {
@@ -27,33 +40,68 @@ function cleanupTrash() {
 
 function deleteRecipe(recipe) {
     if (!firebase.auth().currentUser) {
-    alert("Bitte einloggen!");
-    return;
+        alert("Bitte einloggen!");
+        return;
     }
+
     recipes = recipes.filter(r => r.id !== recipe.id);
     filteredRecipes = filteredRecipes.filter(r => r.id !== recipe.id);
+
     trash.push({ ...recipe, deletedAt: Date.now() });
+
     saveToLocalStorage();
     saveTrash();
-    try { db.ref('recipes').set(recipes).catch(() => {}); } catch(e) {}
+
+    try {
+        db.ref('recipes').set(recipes)
+            .then(() => {
+                console.log("Rezepte aktualisiert");
+            })
+            .catch((err) => {
+                console.error(err);
+                alert(err.message);
+            });
+
+    } catch(e) {
+        console.error(e);
+    }
+
     displayRecipes(filteredRecipes);
 }
-
 function restoreRecipe(recipe) {
     if (!firebase.auth().currentUser) {
-    alert("Bitte einloggen!");
-    return;
+        alert("Bitte einloggen!");
+        return;
     }
+
     trash = trash.filter(r => r.id !== recipe.id);
+
     const { deletedAt, ...clean } = recipe;
+
     recipes.push(clean);
     filteredRecipes = [...recipes];
+
     saveToLocalStorage();
     saveTrash();
-    try { db.ref('recipes').set(recipes).catch(() => {}); } catch(e) {}
+
+    try {
+        db.ref('recipes').set(recipes)
+            .then(() => {
+                console.log("Rezepte wiederhergestellt");
+            })
+            .catch((err) => {
+                console.error(err);
+                alert(err.message);
+            });
+
+    } catch(e) {
+        console.error(e);
+    }
+
     displayRecipes(filteredRecipes);
     displayTrash();
 }
+
 function displayTrash() {
     const container = document.getElementById('trash-list');
     container.innerHTML = '';
@@ -97,72 +145,157 @@ function loadFromLocalStorage() {
     const stored = localStorage.getItem('smillas-recipes');
     return stored ? JSON.parse(stored) : null;
 }
-
 async function loadRecipes() {
     try {
         const snapshot = await Promise.race([
             db.ref('recipes').get(),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), 5000)
+            )
         ]);
+
         if (snapshot.exists()) {
+
             const val = snapshot.val();
-            recipes = Array.isArray(val) ? val.filter(r => r !== null) : Object.values(val);
+
+            recipes = Array.isArray(val)
+                ? val.filter(r => r !== null)
+                : Object.values(val);
+
             saveToLocalStorage();
+
         } else {
+
             const local = loadFromLocalStorage();
+
             if (local && local.length > 0) {
+
                 recipes = local;
+
             } else {
+
                 const response = await fetch('data.json');
                 const data = await response.json();
+
                 recipes = data.recipes;
+
                 saveToLocalStorage();
             }
-            db.ref('recipes').set(recipes).catch(() => {});
+
+            db.ref('recipes').set(recipes)
+                .then(() => {
+                    console.log("Firebase initial gespeichert");
+                })
+                .catch((err) => {
+                    console.error(err);
+                    alert(err.message);
+                });
         }
+
     } catch (e) {
+
+        console.error(e);
+
         const local = loadFromLocalStorage();
+
         if (local && local.length > 0) {
+
             recipes = local;
+
         } else {
+
             const response = await fetch('data.json');
             const data = await response.json();
+
             recipes = data.recipes;
+
             saveToLocalStorage();
         }
     }
+
     // Papierkorb laden
     try {
+
         const tsnap = await Promise.race([
             db.ref('trash').get(),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), 5000)
+            )
         ]);
+
         if (tsnap.exists()) {
+
             const val = tsnap.val();
-            trash = Array.isArray(val) ? val.filter(r => r !== null) : Object.values(val);
+
+            trash = Array.isArray(val)
+                ? val.filter(r => r !== null)
+                : Object.values(val);
+
         } else {
-            trash = JSON.parse(localStorage.getItem('smillas-trash') || '[]');
+
+            trash = JSON.parse(
+                localStorage.getItem('smillas-trash') || '[]'
+            );
         }
+
     } catch(e) {
-        trash = JSON.parse(localStorage.getItem('smillas-trash') || '[]');
+
+        console.error(e);
+
+        trash = JSON.parse(
+            localStorage.getItem('smillas-trash') || '[]'
+        );
     }
+
     cleanupTrash();
 
     // Kaputte via.placeholder.com URLs automatisch ersetzen
     let migrated = false;
+
     recipes = recipes.map(r => {
-        if (r.image && r.image.includes('via.placeholder.com')) {
+
+        if (
+            r.image &&
+            r.image.includes('via.placeholder.com')
+        ) {
+
             migrated = true;
-            return { ...r, image: r.image.replace(/https:\/\/via\.placeholder\.com\/(\d+x\d+)\?/, 'https://placehold.co/$1/0d1f22/00bcd4?') };
+
+            return {
+                ...r,
+                image: r.image.replace(
+                    /https:\/\/via\.placeholder\.com\/(\d+x\d+)\?/,
+                    'https://placehold.co/$1/0d1f22/00bcd4?'
+                )
+            };
         }
+
         return r;
     });
+
     if (migrated) {
+
         saveToLocalStorage();
-        try { db.ref('recipes').set(recipes).catch(() => {}); } catch(e) {}
+
+        try {
+
+            db.ref('recipes').set(recipes)
+                .then(() => {
+                    console.log("Migration gespeichert");
+                })
+                .catch((err) => {
+                    console.error(err);
+                    alert(err.message);
+                });
+
+        } catch(e) {
+
+            console.error(e);
+        }
     }
 
     filteredRecipes = [...recipes];
+
     displayRecipes(filteredRecipes);
 }
 
@@ -617,26 +750,56 @@ document.getElementById('add-recipe-overlay').addEventListener('click', (event) 
         document.getElementById('add-recipe-overlay').style.display = 'none';
     }
 });
-
 async function saveRecipe() {
+
     if (!firebase.auth().currentUser) {
         alert("Bitte einloggen!");
         return;
     }
+
     const name = document.getElementById('recipe-name').value;
     const image = selectedImageDataUrl;
     const description = document.getElementById('recipe-description').value;
-    const ingredients = document.getElementById('recipe-ingredients').value.split(',');
-    const instructions = document.getElementById('recipe-instructions').value;
-    const calories = parseInt(document.getElementById('recipe-calories').value);
-    const protein = parseInt(document.getElementById('recipe-protein').value);
-    const category = document.getElementById('recipe-category').value;
-    const meal = document.querySelector('input[name="meal"]:checked')?.value || null;
-    const size = document.getElementById('recipe-size').value;
-    const tags = document.getElementById('recipe-tags').value.split(',');
 
-    if (!name || !instructions || !calories || !protein || !category || meal.length === 0 || !size) {
-        alert('Bitte alle erforderlichen Felder ausfüllen und mindestens eine Mahlzeit auswählen!');
+    const ingredients = document
+        .getElementById('recipe-ingredients')
+        .value
+        .split(',');
+
+    const instructions = document.getElementById('recipe-instructions').value;
+
+    const calories = parseInt(
+        document.getElementById('recipe-calories').value
+    );
+
+    const protein = parseInt(
+        document.getElementById('recipe-protein').value
+    );
+
+    const category = document.getElementById('recipe-category').value;
+
+    const meal =
+        document.querySelector('input[name="meal"]:checked')?.value || null;
+
+    const size = document.getElementById('recipe-size').value;
+
+    const tags = document
+        .getElementById('recipe-tags')
+        .value
+        .split(',');
+
+    if (
+        !name ||
+        !instructions ||
+        !calories ||
+        !protein ||
+        !category ||
+        !meal ||
+        !size
+    ) {
+        alert(
+            'Bitte alle erforderlichen Felder ausfüllen und mindestens eine Mahlzeit auswählen!'
+        );
         return;
     }
 
@@ -656,25 +819,46 @@ async function saveRecipe() {
     };
 
     if (activeRecipeId) {
-        const existingIndex = recipes.findIndex(r => r.id === activeRecipeId);
+
+        const existingIndex =
+            recipes.findIndex(r => r.id === activeRecipeId);
+
         if (existingIndex !== -1) {
             recipes[existingIndex] = recipeData;
         } else {
             recipes.push(recipeData);
         }
+
     } else {
+
         recipes.push(recipeData);
     }
+
     activeRecipeId = null;
+
     filterRecipes();
 
     document.getElementById('add-recipe-overlay').style.display = 'none';
+
     resetForm();
 
     saveToLocalStorage();
+
     try {
-        db.ref('recipes').set(recipes).catch(() => {});
-    } catch (e) {}
+
+        db.ref('recipes').set(recipes)
+            .then(() => {
+                console.log("Rezepte gespeichert");
+            })
+            .catch((err) => {
+                console.error(err);
+                alert(err.message);
+            });
+
+    } catch (e) {
+
+        console.error(e);
+    }
 }
 
 function openRecipeForm(recipe = null) {
