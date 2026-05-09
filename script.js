@@ -102,6 +102,20 @@ function restoreRecipe(recipe) {
     displayTrash();
 }
 
+function permanentlyDeleteRecipe(id) {
+
+    if (!firebase.auth().currentUser) {
+        alert("Bitte einloggen!");
+        return;
+    }
+
+    trash = trash.filter(r => r.id !== id);
+
+    saveTrash();
+
+    displayTrash();
+}
+
 function displayTrash() {
     const container = document.getElementById('trash-list');
     container.innerHTML = '';
@@ -126,12 +140,20 @@ function displayTrash() {
                     <span class="trash-item-days">Noch ${daysLeft} Tage</span>
                 </div>
 
-                <button>Wiederherstellen</button>
+                <div class="trash-buttons">
+                    <button class="restore-btn">Wiederherstellen</button>
+                    <button class="delete-forever-btn">Endgültig löschen</button>
+                </div>
             `;
 
-            item.querySelector('button').addEventListener('click', (e) => {
+            item.querySelector('.restore-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
                 restoreRecipe(recipe);
+            });
+
+            item.querySelector('.delete-forever-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                permanentlyDeleteRecipe(recipe.id);
             });
 
             container.appendChild(item);

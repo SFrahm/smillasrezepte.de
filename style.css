@@ -395,26 +395,13 @@ header {
     font-family: Georgia, serif !important;
 }
 
-/* Restore Button */
-.restore-btn {
-    padding: 6px 12px;
-    border-radius: 12px;
 
-    background: #292929;
-    border: 1px solid rgba(0, 188, 212, 0.3);
-    color: #00d6f7;
 
-    font-family: Georgia, serif;
-    font-size: 13px;
-
-    cursor: pointer;
-    transition: 0.2s ease;
+.trash-buttons {
+    display: flex;
+    gap: 8px;
 }
 
-.restore-btn:hover {
-    background: rgba(0, 188, 212, 0.12);
-    border-color: #00d6f7;
-}
 
 #recipe-detail-overlay {
     display: none;
