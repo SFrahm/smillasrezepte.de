@@ -67,6 +67,7 @@ function deleteRecipe(recipe) {
     }
 
     displayRecipes(filteredRecipes);
+    saveBackup();
 }
 function restoreRecipe(recipe) {
     if (!firebase.auth().currentUser) {
@@ -100,6 +101,7 @@ function restoreRecipe(recipe) {
 
     displayRecipes(filteredRecipes);
     displayTrash();
+    saveBackup();
 }
 
 function permanentlyDeleteRecipe(id) {
@@ -133,7 +135,6 @@ function displayTrash() {
             item.className = 'trash-item';
 
             item.innerHTML = `
-
 
                 <div class="trash-item-info">
                     <span class="trash-item-name">${recipe.name}</span>
@@ -353,8 +354,8 @@ function displayRecipes(recipesToDisplay) {
     });
 
     mealOrder.forEach(group => {
-        const recipes = grouped[group];
-        if (!recipes.length) return;
+        const groupRecipes = grouped[group];
+        if (!groupRecipes.length) return;
 
         const section = document.createElement('div');
         section.className = 'meal-section';
@@ -366,7 +367,7 @@ function displayRecipes(recipesToDisplay) {
         const grid = document.createElement('div');
         grid.className = 'meal-grid';
 
-        recipes.forEach(recipe => {
+        groupRecipes.forEach(recipe => {
             const card = document.createElement('div');
             card.className = 'recipe-card';
 
@@ -374,12 +375,35 @@ function displayRecipes(recipesToDisplay) {
                 ${imgHtml(recipe, 'card')}
                 <div class="card-bottom">
                     <h3>${recipe.name}</h3>
+
                     <div class="card-actions">
+
+                        <button class="favorite-btn" title="Favorit">
+                            ${recipe.favorite ? "❤️" : "🤍"}
+                        </button>
+
                         <button class="edit-btn" title="Bearbeiten">✏️</button>
                         <button class="delete-btn" title="Löschen">🗑️</button>
+
                     </div>
                 </div>
             `;
+            card.querySelector('.favorite-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+
+                if (!firebase.auth().currentUser) {
+                    alert("Bitte einloggen!");
+                    return;
+                }
+
+                recipe.favorite = !recipe.favorite;
+
+                saveToLocalStorage();
+                db.ref('recipes').set(recipes);
+                saveBackup();
+
+                displayRecipes(filteredRecipes);
+            });
 
             card.querySelector('.edit-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -402,6 +426,7 @@ function displayRecipes(recipesToDisplay) {
     });
     applyAuthUI(firebase.auth().currentUser);
 }
+
 function showRecipeDetail(recipe) {
     const content = document.getElementById('recipe-detail-content');
     content.innerHTML = `
@@ -532,7 +557,7 @@ const savoryEmojis = [
 ];
 
 const sweetEmojis = [
-    '🍰','🥧','🥐','🍪','🍮','🍦', 
+    '🍰','🥧','🥐','🍪','🍮','🍦', '⚪',
     '🧇','🥞','🍫'
 ];
 
@@ -726,6 +751,7 @@ const emojiKeywords = {
     '🍪': ['keks', 'cookie', 'plätzchen'],
     '🍫': ['schoko', 'brownie', 'mousse', 'kakao'],
     '🍦': ['eis', 'sorbet', 'frozen'],
+    '⚪': ['knödel', 'klumpen', 'creme', 'quark'],
     '🥟': ['dumpling', 'teigtasche', 'gyoza'],
     '🍎': ['apfel', 'obst', 'frucht'],
     '🥒': ['gurke', 'salat', 'gemüse'],
@@ -825,6 +851,11 @@ async function saveRecipe() {
         return;
     }
 
+    const existingRecipe = activeRecipeId
+        ? recipes.find(r => r.id === activeRecipeId)
+        : null;
+
+
     const recipeData = {
         id: activeRecipeId || Date.now(),
         name,
@@ -837,7 +868,8 @@ async function saveRecipe() {
         category,
         meal,
         size,
-        tags: tags.map(t => t.trim()).filter(Boolean)
+        tags: tags.map(t => t.trim()).filter(Boolean),
+        favorite: existingRecipe ? existingRecipe.favorite : false
     };
 
     if (activeRecipeId) {
@@ -881,6 +913,7 @@ async function saveRecipe() {
 
         console.error(e);
     }
+    saveBackup();
 }
 
 function openRecipeForm(recipe = null) {
@@ -1145,6 +1178,39 @@ loginOverlay.addEventListener("click", (e) => {
     }
 });
 
+let showingFavorites = false;
+
+document.getElementById('favorites-btn').addEventListener('click', () => {
+
+    showingFavorites = !showingFavorites;
+
+    if (showingFavorites) {
+        filteredRecipes = recipes.filter(r => r.favorite);
+    } else {
+        filteredRecipes = [...recipes];
+    }
+
+    displayRecipes(filteredRecipes);
+});
+
+
+function saveBackup() {
+    db.ref('backups/' + Date.now()).set({
+        recipes: recipes,
+        timestamp: Date.now()
+    });
+}
+
+async function restoreLatestBackup() {
+    const snap = await db.ref('backups').orderByKey().limitToLast(1).get();
+
+    snap.forEach(child => {
+        const data = child.val();
+        recipes = data.recipes;
+
+        db.ref('recipes').set(recipes);
+    });
+}
 
 // Sicherstellen dass Overlay und Formular beim Start sauber sind
 document.getElementById('add-recipe-overlay').style.display = 'none';

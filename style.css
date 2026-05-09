@@ -63,6 +63,7 @@ header {
     font-size: 16px;
 }
 
+
 @media (max-width: 768px) {
 
     #search-input,
@@ -281,6 +282,7 @@ header {
     }
 
     .delete-btn,
+    .favorite-btn,
     .edit-btn {
         background: none;
         border: none;
@@ -296,6 +298,7 @@ header {
 }
 
     .delete-btn:hover,
+    .favorite-btn:hover,
     .edit-btn:hover {
         color: #ff5555;
         background: rgba(255, 85, 85, 0.1);

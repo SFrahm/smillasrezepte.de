@@ -3,7 +3,7 @@
     {
       "id": 1,
       "name": "Veganer Tofu-Scramble",
-      "image": "https://placehold.co/300x200/0d1f22/00bcd4?text=Tofu-Scramble",
+      "image": "🥘",
       "description": "Ein proteinreiches Frühstücksgericht mit Tofu als Ei-Ersatz.",
       "ingredients": ["Tofu", "Paprika", "Zwiebel", "Kurcuma", "Salz"],
       "instructions": "Tofu zerbröseln, Gemüse anbraten, Gewürze hinzufügen, servieren.",
@@ -42,5 +42,6 @@
       "size": "groß",
       "tags": ["Linsen", "Suppe"]
     }
+
   ]
 }
