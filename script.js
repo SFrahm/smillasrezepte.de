@@ -475,9 +475,17 @@ document.getElementById('recipe-detail-overlay').addEventListener('click', (even
 document.getElementById('search-input').addEventListener('input', filterRecipes);
 
 document.getElementById('filter-btn').addEventListener('click', () => {
-    document.getElementById('filter-overlay').style.display = 'flex';
+    const overlay = document.getElementById('filter-overlay');
+    const popup = document.getElementById('filter-popup');
+
+    overlay.classList.add('active');
+
+    // Scroll immer nach oben setzen
+    popup.scrollTop = 0;
 });
+
 document.getElementById('apply-filters').addEventListener('click', applyFilters);
+
 document.getElementById('close-filter').addEventListener('click', closeFilter);
 
 document.getElementById('filter-overlay').addEventListener('click', (event) => {
@@ -487,7 +495,7 @@ document.getElementById('filter-overlay').addEventListener('click', (event) => {
 });
 
 function closeFilter() {
-    document.getElementById('filter-overlay').style.display = 'none';
+    document.getElementById('filter-overlay').classList.remove('active');
 }
 
 function filterRecipes() {
@@ -788,16 +796,16 @@ document.getElementById('recipe-name').addEventListener('input', function () {
 
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
 document.getElementById('cancel-recipe').addEventListener('click', () => {
-    document.getElementById('add-recipe-overlay').style.display = 'none';
+    document.getElementById('add-recipe-overlay').classList.remove('active');
     resetForm();
 });
 
-// Schließe Modal bei Klick auf Overlay
 document.getElementById('add-recipe-overlay').addEventListener('click', (event) => {
     if (event.target.id === 'add-recipe-overlay') {
-        document.getElementById('add-recipe-overlay').style.display = 'none';
+        document.getElementById('add-recipe-overlay').classList.remove('active');
     }
 });
+
 async function saveRecipe() {
 
     if (!firebase.auth().currentUser) {
@@ -892,7 +900,7 @@ async function saveRecipe() {
 
     filterRecipes();
 
-    document.getElementById('add-recipe-overlay').style.display = 'none';
+    document.getElementById('add-recipe-overlay').classList.remove('active');
 
     resetForm();
 
@@ -918,12 +926,18 @@ async function saveRecipe() {
 
 function openRecipeForm(recipe = null) {
     activeRecipeId = recipe ? recipe.id : null;
+
     if (recipe) {
         fillForm(recipe);
     } else {
         resetForm();
     }
-    document.getElementById('add-recipe-overlay').style.display = 'flex';
+
+    const overlay = document.getElementById('add-recipe-overlay');
+    const form = document.getElementById('add-recipe-form');
+
+    overlay.classList.add('active');   // 🔥 DAS ist jetzt korrekt
+    form.scrollTop = 0;
 }
 
 function fillForm(recipe) {
@@ -1213,7 +1227,7 @@ async function restoreLatestBackup() {
 }
 
 // Sicherstellen dass Overlay und Formular beim Start sauber sind
-document.getElementById('add-recipe-overlay').style.display = 'none';
+document.getElementById('add-recipe-overlay').classList.remove('active');
 resetForm();
 
 loadRecipes();
