@@ -300,6 +300,24 @@ header {
     padding: 20px;
 }
 
+#favorites-btn {
+    padding: 0 20px;
+    background-color: #00d6f7;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    height: 40px;
+    width: 50px;
+    font-family: 'Georgia', serif;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    line-height: 1;
+}
+
 #trash-btn {
     background: linear-gradient(145deg, #555, #3a3a3a);
     height: 40px;
@@ -1037,6 +1055,7 @@ input:focus, select:focus, textarea:focus {
         border-radius: 10px;
 
         flex-shrink: 0;
+        line-height: 1;
     }
 }
 

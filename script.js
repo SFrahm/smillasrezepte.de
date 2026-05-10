@@ -1226,6 +1226,11 @@ async function restoreLatestBackup() {
     });
 }
 
+if (window.innerWidth <= 768) {
+    document.getElementById('search-input').placeholder = 'Suche';
+    document.getElementById('filter-btn').textContent = '☰';
+}
+
 // Sicherstellen dass Overlay und Formular beim Start sauber sind
 document.getElementById('add-recipe-overlay').classList.remove('active');
 resetForm();
