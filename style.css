@@ -64,18 +64,7 @@ header {
 }
 
 
-@media (max-width: 768px) {
 
-    #search-input,
-    #filter-btn,
-    #add-recipe-btn,
-    #trash-btn {
-        width: 100%;
-        margin: 0;
-        border-radius: 10px;
-        box-sizing: border-box;
-}
-}
 
 #filter-overlay {
     display: none;
@@ -291,6 +280,7 @@ header {
         font-family: Georgia, serif;
         cursor: pointer;
         padding: 4px 6px;
+        height: 40px;
         box-shadow: none;
         border-radius: 6px;
         transition: color 0.15s, background 0.15s;
@@ -1035,8 +1025,8 @@ input:focus, select:focus, textarea:focus {
     #trash-btn,
     #login-btn,
     #logout-btn {
-        width: 38px;
-        height: 38px;
+        width: 40px;
+        height: 40px;
         padding: 0;
 
         display: flex;
@@ -1044,7 +1034,7 @@ input:focus, select:focus, textarea:focus {
         justify-content: center;
 
         font-size: 17px;
-        border-radius: 12px;
+        border-radius: 10px;
 
         flex-shrink: 0;
     }
