@@ -1014,6 +1014,39 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 768px) {
     .meal-grid {
         grid-template-columns: 1fr;
+    }  
+    
+    .search-container {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Suchfeld soll trotzdem groß bleiben */
+    #search-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* alle oberen Buttons kompakt */
+    #filter-btn,
+    #add-recipe-btn,
+    #favorites-btn,
+    #trash-btn,
+    #login-btn,
+    #logout-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 17px;
+        border-radius: 12px;
+
+        flex-shrink: 0;
     }
 }
 
