@@ -344,6 +344,7 @@ function displayRecipes(recipesToDisplay) {
         "Hauptspeisen": [],
         "Snacks": [],
         "Basen & Zusätze": [],
+        "Brote & Sauerteigstuff": [],
         "Unsortiert": []
     };
 
@@ -1032,10 +1033,14 @@ const mealStructure = [
   {
     group: "Basen & Zusätze",
     items: ["Dips", "Saucen", "Dressings", "Teigbasen"]
+  },
+  {
+    group: "Brote & Sauerteigstuff",
+    items: ["Brote", "Bagel", "Brötchen", "Pizzateig", "Flammkuchenteig"]
   }
 ];
 
-const mealOrder = ["Hauptspeisen", "Snacks", "Basen & Zusätze"];
+const mealOrder = ["Hauptspeisen", "Snacks", "Basen & Zusätze", "Brote & Sauerteigstuff"];
 
 const mealToGroup = {};
 mealStructure.forEach(section => {
@@ -1047,8 +1052,17 @@ mealStructure.forEach(section => {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    function initAccordion(containerId, structure) {
+    function initAccordion(containerId, structure, options = {}) {
+        const {
+            singleSelect = false,
+            inputClass = "meal-filter",
+            inputName = ""
+        } = options;
+
         const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = "";
 
         structure.forEach(section => {
 
@@ -1063,10 +1077,16 @@ document.addEventListener("DOMContentLoaded", () => {
             list.className = "accordion-content";
 
             section.items.forEach(item => {
+
                 const label = document.createElement("label");
 
                 label.innerHTML = `
-                    <input type="checkbox" class="meal-filter" value="${item}">
+                    <input
+                        type="checkbox"
+                        class="${inputClass}"
+                        ${inputName ? `name="${inputName}"` : ""}
+                        data-single="${singleSelect}"
+                        value="${item}">
                     <span>${item}</span>
                 `;
 
@@ -1079,18 +1099,26 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // =========================
     // FILTER (multi select)
-    initAccordion("meal-accordion", mealStructure);
+    // =========================
+    initAccordion("meal-accordion", mealStructure, {
+        singleSelect: false,
+        inputClass: "meal-filter"
+    });
 
-    // RECIPE (single select behavior)
-    if (typeof recipeStructure !== "undefined") {
-        initAccordion("recipe-accordion", recipeStructure);
-    }
+    // =========================
+    // RECIPE (single select)
+    // =========================
+    initAccordion("recipe-accordion", mealStructure, {
+        singleSelect: true,
+        inputClass: "meal-recipe",
+        inputName: "meal"
+    });
 
     // =========================
     // ACCORDION OPEN/CLOSE
     // =========================
-
     document.addEventListener("click", (e) => {
         const header = e.target.closest(".accordion-header");
         if (!header) return;
@@ -1100,19 +1128,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // =========================
-    // RECIPE = ONLY ONE SELECTED
+    // SINGLE SELECT LOGIC (Recipe only)
     // =========================
-
     document.addEventListener("change", (e) => {
 
-        // nur recipe-accordion einschränken
-        if (
-            e.target.matches('#recipe-accordion input[type="checkbox"][name="meal"]')
-        ) {
+        const input = e.target;
+
+        if (!input.matches('#recipe-accordion input[type="checkbox"]')) return;
+
+        if (input.dataset.single !== "true") return;
+
+        if (input.checked) {
             document
-                .querySelectorAll('#recipe-accordion input[type="checkbox"][name="meal"]')
+                .querySelectorAll('#recipe-accordion input[type="checkbox"]')
                 .forEach(cb => {
-                    if (cb !== e.target) cb.checked = false;
+                    if (cb !== input) cb.checked = false;
                 });
         }
     });

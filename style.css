@@ -65,7 +65,6 @@ header {
 
 
 
-
 #filter-overlay {
     display: none;
     position: fixed;
@@ -536,6 +535,17 @@ header {
     margin-bottom: 20px;
 }
 
+#add-recipe-form .checkbox-list label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    color: #ddd; /* WICHTIG: gleiche Farbe wie Filter */
+}
 
 #add-recipe-form {
     position: relative;
@@ -551,9 +561,37 @@ header {
     box-shadow: 0 24px 80px rgba(0,0,0,0.55);
 }
 
+#add-recipe-form label {
+    text-transform: none;
+    font-weight: normal;
+    letter-spacing: normal;
+}
+#add-recipe-form .form-group > label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #00d6f7;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+#add-recipe-form .checkbox-list label {
+    display: flex;
+    align-items: center;
+    gap: 6px;              /* kleiner als 10px */
+    margin-bottom: 4px;    /* statt 10px */
+    font-size: 15px;
+    color: #e8f7ff;
+}
+
+#add-recipe-form .checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 #add-recipe-form h3 {
     margin-top: 0;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
     color: #00d6f7;
     font-size: 24px;
 }
@@ -567,12 +605,63 @@ header {
     margin-bottom: 10px;
 
     font-size: 13px;
-    font-weight: 600;
 
     color: #00d6f7;
 
     letter-spacing: 0.08em;
-    text-transform: uppercase;
+}
+
+#add-recipe-form .accordion-content label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+    margin: 0
+}
+
+#add-recipe-form .accordion-content label span {
+    letter-spacing: normal !important;
+    flex: 1;
+    display: block;
+
+    padding: 8px 10px;
+    border-radius: 8px;
+
+    background: rgba(255,255,255,0.04);
+    color: #ddd;
+
+    font-size: 16px !important;
+    line-height: 1.4;
+
+    transition: 0.15s;
+}
+
+/* hover wie Filter */
+#add-recipe-form .accordion-content label:hover span {
+    background: rgba(0, 188, 212, 0.15);
+}
+
+#add-recipe-form .accordion-content {
+    display: none;
+    flex-direction: column;
+    gap: 5px; /* oder 3px, je nachdem wie dein Filter genau ist */
+}
+
+#add-recipe-form .accordion-content.open {
+    display: flex;
+}
+
+#add-recipe-form .accordion-content label span {
+    padding: 6px 10px;
+}
+
+/* checked state wie Filter */
+#add-recipe-form .accordion-content
+input[type="checkbox"]:checked + span {
+    background: #00d6f7;
+    color: #0b0b0b;
+    font-weight: 600;
 }
 
 .form-group input, .form-group select, .form-group textarea {
@@ -698,7 +787,6 @@ input:focus, select:focus, textarea:focus {
 #add-recipe-form .form-group {
     margin-bottom: 16px;
 }
-
 
 
 #add-recipe-form .checkbox-list label {
