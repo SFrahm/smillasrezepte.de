@@ -587,9 +587,6 @@ function showRecipeDetail(recipe) {
 
     content.innerHTML = `
         ${imgHtml(recipe, 'detail')}
-        <div class="detail-actions">
-            <button id="detail-edit-btn" class="edit-btn" type="button">Bearbeiten</button>
-        </div>
         <div class="detail-header">
             <h2>${recipe.name}</h2>
             <div class="detail-scaling-controls">
@@ -600,6 +597,7 @@ function showRecipeDetail(recipe) {
                     <button id="scale-increase" type="button">+</button>
                 </div>
             </div>
+            <button id="detail-edit-btn" class="edit-btn" type="button">Bearbeiten</button>
         </div>
         <p class="detail-description">${recipe.description}</p>
         <div class="detail-meta">
