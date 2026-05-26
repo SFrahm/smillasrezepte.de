@@ -428,24 +428,191 @@ function displayRecipes(recipesToDisplay) {
     applyAuthUI(firebase.auth().currentUser);
 }
 
+let detailOriginalIngredients = [];
+let detailCurrentScale = 1;
+let detailOriginalNutrition = { calories: null, protein: null };
+
+function normalizeIngredientLines(recipe) {
+    if (Array.isArray(recipe.ingredients)) {
+        return recipe.ingredients.map(i => String(i).trim()).filter(Boolean);
+    }
+    if (typeof recipe.ingredients === 'string') {
+        return recipe.ingredients
+            .split(',')
+            .map(i => String(i).trim())
+            .filter(Boolean);
+    }
+    return [];
+}
+
+function parseIngredientLine(line) {
+    const units = [
+        'g', 'gramm', 'kg', 'kilogramm', 'ml', 'milliliter', 'l', 'liter',
+        'tl', 'teelöffel', 'el', 'esslöffel', 'stück', 'stk\.?',
+        'prise', 'prisen', 'packung', 'pck\.?', 'dose', 'dosen', 'becher',
+        'tasse', 'tassen'
+    ].join('|');
+
+    const regex = new RegExp(`^\\s*((?:\\d+(?:[.,]\\d+)?(?:\\s+\\d+\\/\\d+)?|\\d+\\/\\d+))\\s*((?:${units}))?\\b(.*)$`, 'i');
+    const match = line.match(regex);
+
+    if (!match) {
+        return { hasQuantity: false, original: line };
+    }
+
+    const quantity = parseIngredientQuantity(match[1]);
+    if (quantity === null) {
+        return { hasQuantity: false, original: line };
+    }
+
+    return {
+        hasQuantity: true,
+        quantity,
+        unit: match[2] ? match[2].trim() : '',
+        rest: match[3] ? match[3].trim() : '',
+        original: line
+    };
+}
+
+function parseIngredientQuantity(quantityString) {
+    const normalized = quantityString.trim().replace(',', '.');
+    const mixedFraction = normalized.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+    if (mixedFraction) {
+        const whole = Number(mixedFraction[1]);
+        const numerator = Number(mixedFraction[2]);
+        const denominator = Number(mixedFraction[3]);
+        if (denominator === 0) return null;
+        return whole + numerator / denominator;
+    }
+
+    const simpleFraction = normalized.match(/^(\d+)\/(\d+)$/);
+    if (simpleFraction) {
+        const numerator = Number(simpleFraction[1]);
+        const denominator = Number(simpleFraction[2]);
+        if (denominator === 0) return null;
+        return numerator / denominator;
+    }
+
+    const value = parseFloat(normalized);
+    return Number.isFinite(value) ? value : null;
+}
+
+function formatScaledQuantity(value) {
+    if (!Number.isFinite(value)) {
+        return String(value);
+    }
+    if (Math.abs(Math.round(value) - value) < 1e-8) {
+        return String(Math.round(value));
+    }
+    if (Math.abs(Math.round(value * 10) - value * 10) < 1e-8) {
+        return value.toFixed(1).replace(/\.0+$/, '').replace('.', ',');
+    }
+    if (Math.abs(Math.round(value * 100) - value * 100) < 1e-8) {
+        return value.toFixed(2).replace(/\.0+$/, '').replace('.', ',');
+    }
+    return value.toFixed(3).replace(/\.0+$/, '').replace('.', ',');
+}
+
+function formatScaleInputValue(value) {
+    if (!Number.isFinite(value)) {
+        return String(value);
+    }
+    if (Math.abs(Math.round(value) - value) < 1e-8) {
+        return String(Math.round(value));
+    }
+    if (Math.abs(Math.round(value * 10) - value * 10) < 1e-8) {
+        return value.toFixed(1).replace(/\.0+$/, '');
+    }
+    if (Math.abs(Math.round(value * 100) - value * 100) < 1e-8) {
+        return value.toFixed(2).replace(/\.0+$/, '');
+    }
+    return value.toFixed(3).replace(/\.0+$/, '');
+}
+
+function scaleIngredientLine(line, scale) {
+    const parsed = parseIngredientLine(line);
+    if (!parsed.hasQuantity || scale === 1) {
+        return parsed.original;
+    }
+
+    const scaledValue = parsed.quantity * scale;
+    const formattedValue = formatScaledQuantity(scaledValue);
+    const unitPart = parsed.unit ? ` ${parsed.unit}` : '';
+    const restPart = parsed.rest ? ` ${parsed.rest}` : '';
+    return `${formattedValue}${unitPart}${restPart}`.trim();
+}
+
+function setRecipeDetailScale(scale) {
+    if (!Number.isFinite(scale) || scale <= 0) {
+        return;
+    }
+    detailCurrentScale = scale;
+    const ingredientList = document.getElementById('recipe-ingredients-list');
+    if (ingredientList) {
+        ingredientList.innerHTML = detailOriginalIngredients
+            .map((ingredient) => `<li>${scaleIngredientLine(ingredient, scale)}</li>`)
+            .join('');
+    }
+
+    const input = document.getElementById('scale-factor-input');
+    if (input) {
+        input.value = formatScaledQuantity(scale);
+    }
+
+    const caloriesValue = document.getElementById('recipe-calories-value');
+    const proteinValue = document.getElementById('recipe-protein-value');
+    if (caloriesValue && Number.isFinite(detailOriginalNutrition.calories)) {
+        caloriesValue.textContent = formatScaledQuantity(detailOriginalNutrition.calories * scale);
+    }
+    if (proteinValue && Number.isFinite(detailOriginalNutrition.protein)) {
+        proteinValue.textContent = formatScaledQuantity(detailOriginalNutrition.protein * scale);
+    }
+
+    const scaleInput = document.getElementById('scale-factor-input');
+    if (scaleInput) {
+        scaleInput.value = formatScaleInputValue(scale);
+    }
+}
+
 function showRecipeDetail(recipe) {
     const content = document.getElementById('recipe-detail-content');
+    const normalizedIngredients = normalizeIngredientLines(recipe);
+    detailOriginalIngredients = normalizedIngredients;
+    detailCurrentScale = 1;
+
+    detailOriginalNutrition = {
+        calories: Number(recipe.calories),
+        protein: Number(recipe.protein)
+    };
+
     content.innerHTML = `
         ${imgHtml(recipe, 'detail')}
         <div class="detail-actions">
             <button id="detail-edit-btn" class="edit-btn" type="button">Bearbeiten</button>
         </div>
-        <h2>${recipe.name}</h2>
+        <div class="detail-header">
+            <h2>${recipe.name}</h2>
+            <div class="detail-scaling-controls">
+                <span class="detail-scaling-label">Portion</span>
+                <div class="portion-control">
+                    <button id="scale-decrease" type="button">−</button>
+                    <input id="scale-factor-input" type="number" min="0.1" step="0.1" value="1" />
+                    <button id="scale-increase" type="button">+</button>
+                </div>
+            </div>
+        </div>
         <p class="detail-description">${recipe.description}</p>
         <div class="detail-meta">
-            <span>${recipe.calories} kcal</span>
-            <span>${recipe.protein}g Protein</span>
+            <span><strong id="recipe-calories-value">${Number.isFinite(detailOriginalNutrition.calories) ? formatScaledQuantity(detailOriginalNutrition.calories) : recipe.calories}</strong> kcal</span>
+            <span><strong id="recipe-protein-value">${Number.isFinite(detailOriginalNutrition.protein) ? formatScaledQuantity(detailOriginalNutrition.protein) : recipe.protein}</strong>g Protein</span>
             <span>${recipe.category}</span>
             <span>${Array.isArray(recipe.meal) ? recipe.meal.join(', ') : recipe.meal}</span>
             <span>${recipe.size}</span>
         </div>
         <h4>Zutaten</h4>
-        <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
+        <ul id="recipe-ingredients-list">
+            ${normalizedIngredients.map((ingredient) => `<li>${scaleIngredientLine(ingredient, 1)}</li>`).join('')}
+        </ul>
         <h4>Zubereitung</h4>
         <p>${recipe.instructions}</p>
     `;
@@ -454,11 +621,43 @@ function showRecipeDetail(recipe) {
 
     if (detailEditButton) {
         detailEditButton.style.display = firebase.auth().currentUser ? "inline-block" : "none";
-
         detailEditButton.addEventListener('click', (e) => {
             e.stopPropagation();
             document.getElementById('recipe-detail-overlay').style.display = 'none';
             openRecipeForm(recipe);
+        });
+    }
+
+    const decreaseButton = document.getElementById('scale-decrease');
+    const increaseButton = document.getElementById('scale-increase');
+    const scaleInput = document.getElementById('scale-factor-input');
+
+    if (decreaseButton) {
+        decreaseButton.addEventListener('click', () => {
+            const next = Math.max(0.1, detailCurrentScale - 0.5);
+            setRecipeDetailScale(next);
+        });
+    }
+
+    if (increaseButton) {
+        increaseButton.addEventListener('click', () => {
+            setRecipeDetailScale(detailCurrentScale + 0.5);
+        });
+    }
+
+    if (scaleInput) {
+        scaleInput.addEventListener('change', () => {
+            const factor = Number(scaleInput.value);
+            if (!Number.isFinite(factor) || factor <= 0) {
+                scaleInput.value = formatScaleInputValue(detailCurrentScale);
+                return;
+            }
+            setRecipeDetailScale(factor);
+        });
+        scaleInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                scaleInput.dispatchEvent(new Event('change'));
+            }
         });
     }
 
@@ -523,18 +722,25 @@ function applyFilters() {
     filteredRecipes = recipes.filter(recipe => {
 
         // 🔥 SEARCH bleibt erhalten
+        const recipeIngredients = Array.isArray(recipe.ingredients)
+            ? recipe.ingredients
+            : (typeof recipe.ingredients === 'string' ? recipe.ingredients.split(',').map(i => i.trim()) : []);
+
         const matchesSearch =
             !query ||
             recipe.name.toLowerCase().includes(query) ||
             recipe.description.toLowerCase().includes(query) ||
-            recipe.ingredients.some(ing => ing.toLowerCase().includes(query));
+            recipeIngredients.some(ing => ing.toLowerCase().includes(query));
+
+        const caloriesValue = Number(recipe.calories) || 0;
+        const proteinValue = Number(recipe.protein) || 0;
 
         return (
             matchesSearch &&
-            recipe.calories >= minCalories &&
-            recipe.calories <= maxCalories &&
-            recipe.protein >= minProtein &&
-            recipe.protein <= maxProtein &&
+            caloriesValue >= minCalories &&
+            caloriesValue <= maxCalories &&
+            proteinValue >= minProtein &&
+            proteinValue <= maxProtein &&
             (selectedCategories.length === 0 || selectedCategories.includes(recipe.category)) &&
             (selectedMeals.length === 0 || selectedMeals.includes(recipe.meal)) &&
             (selectedSizes.length === 0 || selectedSizes.includes(recipe.size)) &&
