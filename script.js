@@ -593,7 +593,7 @@ function showRecipeDetail(recipe) {
         <div class="detail-header">
             <h2>${recipe.name}</h2>
             <div class="detail-scaling-controls">
-                <span class="detail-scaling-label">Portion</span>
+                <span class="detail-scaling-label">Portionen</span>
                 <div class="portion-control">
                     <button id="scale-decrease" type="button">−</button>
                     <input id="scale-factor-input" type="number" min="0.1" step="0.1" value="1" />
