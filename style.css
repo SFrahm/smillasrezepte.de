@@ -101,11 +101,48 @@ header {
     display: flex;
 }
 
+#filter-popup .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
 #filter-popup h3 {
-    margin: 0 0 18px;
+    margin: 0;
     font-size: 24px;
     color: #00d6f7;
     letter-spacing: 0.02em;
+}
+
+.filter-reset-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 0;
+    flex: none;
+    padding: 6px 10px;
+    background: none;
+    color: #ff5555;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    font-size: 18px;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    box-sizing: border-box;
+    height: 40px;
+    line-height: 1;
+}
+
+.filter-reset-btn:hover,
+.filter-reset-btn:focus-visible {
+    color: #ff5555;
+    background: rgba(255, 85, 85, 0.08);
+    border-color: #ff5555;
+    outline: none;
 }
 
 #filter-popup .filter-section > label {
@@ -273,7 +310,7 @@ header {
     .favorite-btn,
     .edit-btn {
         background: none;
-        border: none;
+        border: 1px solid transparent;
         color: #666;
         font-size: 16px;
         font-family: Georgia, serif;
@@ -282,17 +319,27 @@ header {
         height: 40px;
         box-shadow: none;
         border-radius: 6px;
-        transition: color 0.15s, background 0.15s;
+        transition: color 0.15s, background 0.15s, border-color 0.15s;
         flex-shrink: 0;
-}
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
 
     .delete-btn:hover,
     .favorite-btn:hover,
-    .edit-btn:hover {
+    .edit-btn:hover,
+    .edit-btn:focus-visible {
         color: #ff5555;
         background: rgba(255, 85, 85, 0.1);
+        border-color: #ff5555;
         transform: none;
         box-shadow: none;
+        outline: none;
+    }
+
+    .delete-btn:focus-visible,
+    .favorite-btn:focus-visible {
+        outline: none;
     }
 
 #recipe-list {
@@ -865,6 +912,11 @@ button {
         0 2px 4px rgba(0,0,0,0.25),
         inset 0 1px 0 rgba(255,255,255,0.2);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    font-family: 'Georgia', serif;
+}
+
+.mode-btn {
+    font-family: 'Georgia', serif;
 }
 
 button:hover {

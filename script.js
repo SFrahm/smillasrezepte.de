@@ -684,6 +684,8 @@ document.getElementById('filter-btn').addEventListener('click', () => {
 
 document.getElementById('apply-filters').addEventListener('click', applyFilters);
 
+document.getElementById('reset-filters').addEventListener('click', resetFilters);
+
 document.getElementById('close-filter').addEventListener('click', closeFilter);
 
 document.getElementById('filter-overlay').addEventListener('click', (event) => {
@@ -691,6 +693,16 @@ document.getElementById('filter-overlay').addEventListener('click', (event) => {
         closeFilter();
     }
 });
+
+function resetFilters() {
+    document.getElementById('min-calories').value = '';
+    document.getElementById('max-calories').value = '';
+    document.getElementById('min-protein').value = '';
+    document.getElementById('max-protein').value = '';
+    document.getElementById('ingredients-input').value = '';
+    document.querySelectorAll('#filter-popup input[type="checkbox"]').forEach(cb => cb.checked = false);
+    applyFilters();
+}
 
 function closeFilter() {
     document.getElementById('filter-overlay').classList.remove('active');
