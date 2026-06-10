@@ -1079,6 +1079,8 @@ document.getElementById('recipe-name').addEventListener('input', function () {
     if (emojiMode === 'ai') updateAIView(this.value);
 });
 
+document.getElementById('parse-recipe-text-btn')?.addEventListener('click', handleParseRecipeText);
+
 document.getElementById('save-recipe').addEventListener('click', saveRecipe);
 document.getElementById('cancel-recipe').addEventListener('click', () => {
     document.getElementById('add-recipe-overlay').classList.remove('active');
@@ -1090,6 +1092,321 @@ document.getElementById('add-recipe-overlay').addEventListener('click', (event) 
         document.getElementById('add-recipe-overlay').classList.remove('active');
     }
 });
+
+function setParseStatus(message, isError = false) {
+    const status = document.getElementById('recipe-parse-status');
+    const error = document.getElementById('recipe-parse-error');
+    if (status) status.textContent = isError ? '' : message;
+    if (error) error.textContent = isError ? message : '';
+}
+
+function setParseLoading(isLoading) {
+    const button = document.getElementById('parse-recipe-text-btn');
+    const status = document.getElementById('recipe-parse-status');
+    if (button) button.disabled = isLoading;
+    if (status) status.textContent = isLoading ? 'Analyse läuft…' : '';
+}
+
+async function handleParseRecipeText() {
+    const text = document.getElementById('recipe-text-input')?.value.trim();
+    if (!text) {
+        setParseStatus('Bitte zuerst Rezepttext eingeben.', true);
+        return;
+    }
+
+    const rawFactor = document.getElementById('recipe-import-factor')?.value.trim() || '1';
+    const importFactor = parseFloat(rawFactor.replace(',', '.'));
+    const scale = importFactor > 0 ? importFactor : 1;
+
+    setParseStatus('', false);
+    setParseLoading(true);
+
+    try {
+        const parsed = await parseRecipeText(text, scale);
+
+        if (!parsed || (!parsed.ingredients?.length && !parsed.instructions)) {
+            setParseStatus('Kein Rezept erkannt. Bitte einen anderen Text probieren.', true);
+            return;
+        }
+
+        prefillParsedRecipe(parsed);
+        setParseStatus('Formular wurde vorgefüllt. Bitte prüfen und speichern.', false);
+    } catch (err) {
+        console.error(err);
+        setParseStatus('Analyse fehlgeschlagen. Bitte später erneut versuchen.', true);
+    } finally {
+        setParseLoading(false);
+    }
+}
+
+async function parseRecipeText(text, scale = 1) {
+    return parseRecipeTextLocally(text, scale);
+}
+
+function prefillParsedRecipe(parsed) {
+    if (parsed.ingredients) {
+        document.getElementById('recipe-ingredients').value = Array.isArray(parsed.ingredients)
+            ? parsed.ingredients.join(', ')
+            : parsed.ingredients;
+    }
+    if (parsed.instructions) {
+        document.getElementById('recipe-instructions').value = Array.isArray(parsed.instructions)
+            ? parsed.instructions.join('\n')
+            : parsed.instructions;
+    }
+    if (parsed.calories != null && !Number.isNaN(parsed.calories)) {
+        document.getElementById('recipe-calories').value = parsed.calories;
+    }
+    if (parsed.protein != null && !Number.isNaN(parsed.protein)) {
+        document.getElementById('recipe-protein').value = parsed.protein;
+    }
+}
+
+function parseRecipeTextLocally(text, scale = 1) {
+    const cleaned = text
+        .replace(/https?:\/\/\S+/gi, '')
+        .replace(/www\.\S+/gi, '')
+        .replace(/@\S+/g, '')
+        .replace(/#\S+/g, '')
+        .replace(/(Abonniere|Follow|Folgt|Like|Teile|Subscribe|Werbung|Anzeige|Sponsored|Promo|Rabatt|Code|Instagram|TikTok|YouTube|Spotify|Facebook|Twitter|Video|Musik|Folgt mir|Hier ist das Rezept|Hier zeige ich|In diesem Video)/gi, '')
+        .replace(/\r\n/g, '\n')
+        .replace(/\t/g, ' ')
+        .trim();
+
+    const lines = cleaned
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line && !isIrrelevantLine(line));
+
+    if (!lines.length) {
+        return null;
+    }
+
+    const calories = extractNumber(cleaned, /(?:kalorien|kcal)\s*[:\-]?\s*(\d{2,4})/i) || extractNumber(cleaned, /(\d{2,4})\s*kcal/i);
+    const protein = extractNumber(cleaned, /(?:protein|eiweiß)\s*[:\-]?\s*(\d{1,3})\s*(?:g)?/i) || extractNumber(cleaned, /(\d{1,3})\s*(?:g|gramm)\s*(?:protein|eiweiß)/i);
+
+    const sections = splitRecipeSections(lines);
+
+    const ingredients = sections.ingredients
+        .map(cleanIngredientLine)
+        .map(line => scaleIngredientLine(line, scale))
+        .filter(Boolean);
+    const instructions = sections.instructions.map(cleanInstructionLine).filter(Boolean);
+
+    if (!ingredients.length && !instructions.length && calories == null && protein == null) {
+        return null;
+    }
+
+    return {
+        ingredients: [...new Set(ingredients)],
+        instructions: instructions.join('\n'),
+        calories: calories != null ? Math.round(calories * scale) : null,
+        protein: protein != null ? Number((protein * scale).toFixed(1)) : null
+    };
+}
+
+function scaleIngredientLine(line, scale) {
+    const cleaned = cleanIngredientLine(line);
+    if (scale === 1) {
+        return cleaned;
+    }
+    const quantityPattern = /^(\d+(?:[.,]\d+)?(?:\/\d+)?)(?:\s*)?(?:(g|kg|gramm|ml|l|cl|tl|tsp|el|esslöffel|teelöffel|tasse|becher|dose|dosen|stück|stk|prise|prisen|packung|handvoll|bund|scheibe|scheiben|stange|portion|portionen|spritzer)(?=\s|$|[^A-Za-zÄÖÜäöüß]))?(?:\s*)(.*)$/i;
+    const match = cleaned.match(quantityPattern);
+    if (!match) {
+        return cleaned;
+    }
+
+    const rawQuantity = match[1];
+    const unit = match[2] || '';
+    const rest = match[3] ? match[3].trim() : '';
+    const quantity = parseIngredientNumber(rawQuantity);
+    if (!Number.isFinite(quantity)) {
+        return cleaned;
+    }
+
+    const scaledValue = quantity * scale;
+    const scaledQuantityText = formatScaledNumber(scaledValue);
+    const scaledUnit = unit;
+    return `${scaledQuantityText}${scaledUnit}${rest ? ' ' + rest : ''}`.trim();
+}
+
+function parseIngredientNumber(raw) {
+    const trimmed = raw.replace(',', '.').trim();
+    if (trimmed.includes('/')) {
+        const parts = trimmed.split('/').map(part => part.trim());
+        if (parts.length === 2) {
+            const numerator = parseFloat(parts[0].replace(',', '.'));
+            const denominator = parseFloat(parts[1].replace(',', '.'));
+            if (Number.isFinite(numerator) && Number.isFinite(denominator) && denominator !== 0) {
+                return numerator / denominator;
+            }
+        }
+    }
+    return parseFloat(trimmed);
+}
+
+function formatScaledNumber(value) {
+    if (!Number.isFinite(value)) {
+        return String(value);
+    }
+    const rounded = Math.round(value * 100) / 100;
+    if (Number.isInteger(rounded)) {
+        return String(rounded);
+    }
+    return rounded.toString().replace(/\.0+$/, '').replace(/(\.[0-9]*?)0+$/, '$1');
+}
+
+function splitRecipeSections(lines) {
+    const ingredientHeadingRx = /\b(?:zutaten|ingredients|einkaufsliste|du brauchst|das brauchst du|was du brauchst)\b/i;
+    const instructionHeadingRx = /\b(?:rezept|das rezept|zubereitung|anleitung|so geht(?:'s)?|schritte|directions|instructions|method)\b/i;
+    const nutritionHeadingRx = /\b(?:nährwerte|gesamtnährwerte|makros|nutrition|kalorien|kcal|protein|eiweiß|fett|kohlenhydrate|carbs)\b/i;
+
+    const sections = { ingredients: [], instructions: [], nutrition: [] };
+    let currentSection = 'unknown';
+
+    for (let i = 0; i < lines.length; i++) {
+        const raw = lines[i].trim();
+        const normalized = raw.replace(/^[\-\*•]\s*/g, '').trim();
+        const lower = normalized.toLowerCase();
+
+        if (ingredientHeadingRx.test(normalized)) {
+            currentSection = 'ingredients';
+            continue;
+        }
+        if (instructionHeadingRx.test(normalized)) {
+            currentSection = 'instructions';
+            continue;
+        }
+        if (nutritionHeadingRx.test(normalized) || isNutritionLine(normalized)) {
+            currentSection = 'nutrition';
+            sections.nutrition.push(normalized);
+            continue;
+        }
+
+        if (currentSection === 'unknown') {
+            if (isLikelyInstructionLine(normalized)) {
+                currentSection = 'instructions';
+            } else if (isLikelyIngredientLine(normalized)) {
+                currentSection = 'ingredients';
+            } else if (i === 0) {
+                currentSection = 'ingredients';
+            }
+        }
+
+        if (currentSection === 'ingredients') {
+            if (!isNutritionLine(normalized) && !isHeadingLine(normalized)) {
+                sections.ingredients.push(normalized);
+            }
+            continue;
+        }
+
+        if (currentSection === 'instructions') {
+            if (!isNutritionLine(normalized) && !isHeadingLine(normalized)) {
+                sections.instructions.push(normalized);
+            }
+            continue;
+        }
+
+        if (currentSection === 'unknown') {
+            if (isLikelyIngredientLine(normalized)) {
+                sections.ingredients.push(normalized);
+            } else if (isLikelyInstructionLine(normalized)) {
+                sections.instructions.push(normalized);
+            }
+        }
+    }
+
+    return sections;
+}
+
+function isIrrelevantLine(line) {
+    const lower = line.toLowerCase();
+    if (/^(abonnier|folge|folgt|like|teilt|subscribe|werbe|anzeige|sponsored|promo|rabatt|code|link in bio|klick|instagram|tiktok|youtube|facebook|twitter|spotify|musik|video|heute|in diesem video|hier ist das rezept|hier zeige ich|folgt mir|ich zeige euch)/i.test(lower)) {
+        return true;
+    }
+    if (/^(https?:\/\/|www\.|@|#)/.test(line)) {
+        return true;
+    }
+    if (line.length < 5 && /[^a-zäöüß0-9]/i.test(line)) {
+        return true;
+    }
+    return false;
+}
+
+function isNutritionLine(line) {
+    return /\b(?:kcal|kalorien|protein|eiweiß|fett|kohlenhydrate|carbs|nährwerte|makros|gesamtnährwerte)\b/i.test(line);
+}
+
+function isHeadingLine(line) {
+    return /\b(?:zutaten|ingredients|einkaufsliste|du brauchst|das brauchst du|was du brauchst|rezept|das rezept|zubereitung|anleitung|so geht(?:'s)?|schritte|directions|instructions|method|nährwerte|gesamtnährwerte|makros|nutrition)\b/i.test(line);
+}
+
+function cleanIngredientLine(line) {
+    return line.replace(/^[\-\*•]\s*/g, '').trim();
+}
+
+function cleanInstructionLine(line) {
+    let cleaned = line.replace(/^[\-\*•]\s*/g, '').trim();
+    cleaned = cleaned.replace(/^(\d+)\s*[:\)\.]+\s*/, '$1. ');
+    return cleaned;
+}
+
+function isLikelyIngredientLine(line) {
+    const normalized = line.replace(/^[\-\*•]\s*/g, '').trim();
+    if (!normalized || isHeadingLine(normalized) || isNutritionLine(normalized)) {
+        return false;
+    }
+
+    const quantityWithUnit = /(^|\s)\d+([.,]\d+)?(?:\/\d+)?\s*(?:g|kg|gramm|ml|l|cl|tl|tsp|el|esslöffel|teelöffel|tasse|becher|dose|dosen|stück|stk|prise|prisen|packung|handvoll|bund|scheibe|scheiben|stange|portion|portionen|spritzer)?(?=\s|$)/i;
+    const simpleQuantity = /(^|\s)\d+([.,]\d+)?(?:\/\d+)?(?=\s|$)/i;
+    const hasQuantity = quantityWithUnit.test(normalized) || simpleQuantity.test(normalized);
+    const hasIngredientSeparator = /\b(?:und|mit|plus)\b/i.test(normalized) || /\//.test(normalized) || /,/.test(normalized);
+    const containsWord = /[a-zäöüß]/i.test(normalized);
+    const looksLikeInstruction = isLikelyInstructionLine(normalized);
+
+    return (hasQuantity || hasIngredientSeparator || (containsWord && normalized.length < 90 && !/[!?]$/.test(normalized) && !looksLikeInstruction));
+}
+
+function isLikelyInstructionLine(line) {
+    const normalized = line.replace(/^[\-\*•]\s*/g, '').trim();
+    if (!normalized) {
+        return false;
+    }
+
+    if (/^\d+\s*[:\)\.]/.test(normalized)) {
+        return true;
+    }
+    if (/\b(?:zubereitung|anleitung|schritte|so geht(?:'s)?|directions|instructions|method)\b/i.test(normalized)) {
+        return true;
+    }
+
+    const verbs = /(schneiden|hacken|anbraten|kochen|backen|vermengen|mischen|würzen|erhitzen|köcheln|servieren|hinzufügen|unterrühren|pürieren|rühren|salzen|pfeffern|marinieren|braten|garen|geben|legen|mixen|rühren|ziehen lassen|ziehen lassen|zerkleinern|schälen|schneiden|festdrücken|backen|lassen)/i;
+    if (verbs.test(normalized)) {
+        return true;
+    }
+    if (/\b(?:bei|für|in|nach|danach|dann|anschließend|anfangs|zuletzt|zuerst|nun|jetzt)\b/i.test(normalized) && /\b(?:°|grad|min|sek|stunde|stunden|ofeng|ofen|backen|kochen)\b/i.test(normalized)) {
+        return true;
+    }
+    if (/[.!?]$/.test(normalized) && !/(^\d+\s*(?:g|ml|l|tl|el|dose|handvoll))/i.test(normalized)) {
+        return true;
+    }
+
+    return false;
+}
+
+function normalizeRecipeLine(line) {
+    let normalized = line.replace(/^[\-\*•]\s*/g, '').trim();
+    normalized = normalized.replace(/\s{2,}/g, ' ');
+    if (/^(?:für \d+ portionen|ergibt \d+ portionen|reicht für \d+ portionen)$/i.test(normalized)) {
+        return '';
+    }
+    return normalized;
+}
+
+function extractNumber(text, regex) {
+    const match = text.match(regex);
+    return match ? Number(match[1].replace(',', '.')) : null;
+}
 
 async function saveRecipe() {
 
@@ -1228,6 +1545,9 @@ function openRecipeForm(recipe = null) {
 function fillForm(recipe) {
     selectedImageDataUrl = recipe.image || '';
     document.getElementById('recipe-name').value = recipe.name || '';
+    document.getElementById('recipe-text-input').value = '';
+    document.getElementById('recipe-parse-status').textContent = '';
+    document.getElementById('recipe-parse-error').textContent = '';
     document.getElementById('recipe-image').value = '';
     document.getElementById('recipe-description').value = recipe.description || '';
     document.getElementById('recipe-ingredients').value = Array.isArray(recipe.ingredients) ? recipe.ingredients.join(', ') : (recipe.ingredients || '');
@@ -1281,7 +1601,10 @@ function resetForm() {
     document.getElementById('recipe-category').value = 'süß';
     document.getElementById('recipe-size').value = 'klein';
     document.getElementById('recipe-tags').value = '';
-    document.querySelectorAll('.meal-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('recipe-text-input').value = '';
+    document.getElementById('recipe-parse-status').textContent = '';
+    document.getElementById('recipe-parse-error').textContent = '';
+    document.querySelectorAll('input[name="meal"]').forEach(cb => cb.checked = false);
     clearEmojiSelection();
     emojiMode = 'ai';
     document.getElementById('mode-ai').classList.add('active');

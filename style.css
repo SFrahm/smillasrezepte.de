@@ -1074,6 +1074,76 @@ input:focus, select:focus, textarea:focus {
     min-height: 90px;
 }
 
+#recipe-text-input {
+    min-height: 140px;
+}
+
+.ai-parse-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.ai-parse-actions button {
+    flex: none;
+    padding: 10px 14px;
+    background: #00d6f7;
+    color: #ffffff;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.ai-parse-actions button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.ai-parse-actions button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.import-scale-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: #ffffff;
+    flex: none;
+}
+
+.import-scale-control input {
+    width: 76px;
+    max-width: 90px;
+    min-width: 60px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.import-scale-control input:focus {
+    outline: 2px solid rgba(0, 214, 247, 0.45);
+    outline-offset: 1px;
+}
+
+.parse-status {
+    color: #b8fff8;
+    font-size: 13px;
+}
+
+.parse-error {
+    margin: 8px 0 0;
+    color: #ff7f7f;
+    font-size: 13px;
+}
+
 #recipe-image {
     padding: 8px;
     cursor: pointer;
