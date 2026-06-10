@@ -1639,7 +1639,7 @@ const mealStructure = [
   },
   {
     group: "Basen & Zusätze",
-    items: ["Dips", "Saucen", "Dressings", "Teigbasen"]
+    items: ["Aufschnitt/ Dips", "Saucen", "Dressings", "Teigbasen"]
   },
   {
     group: "Brote & Sauerteigstuff",
