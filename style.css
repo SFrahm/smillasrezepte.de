@@ -234,6 +234,7 @@ header {
 
 
 .recipe-card {
+    position: relative;
     background: linear-gradient(160deg, #2f2f2f 0%, #232323 100%);
     border-radius: 15px;
     overflow: hidden;
@@ -242,6 +243,21 @@ header {
         0 1px 3px rgba(0,0,0,0.3),
         inset 0 1px 0 rgba(255,255,255,0.05);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.recipe-card .scale-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    background: rgba(0, 188, 212, 0.95);
+    color: #0f1720;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 999px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 .recipe-card:hover {

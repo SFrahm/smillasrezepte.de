@@ -1,5 +1,6 @@
 let recipes = [];
 let filteredRecipes = [];
+const recipeScaleMap = new Map();
 let trash = [];
 let selectedImageDataUrl = '';
 let activeRecipeId = null;
@@ -326,6 +327,64 @@ function isUrl(str) {
     return str && (str.startsWith('data:') || str.startsWith('http'));
 }
 
+function roundScale(value) {
+    if (!Number.isFinite(value)) {
+        return value;
+    }
+    const stepped = Math.ceil(value / 0.25) * 0.25;
+    return Number(stepped.toFixed(2));
+}
+
+function doesRecipeFitAtScale(recipe, scale, nutritionFilters) {
+    return nutritionFilters.every(({ field, min, max }) => {
+        const rawValue = Number(recipe[field]);
+        const scaledValue = Number.isFinite(rawValue) ? rawValue * scale : 0;
+
+        if (min > 0 && scaledValue < min) {
+            return false;
+        }
+        if (max < Infinity && scaledValue > max) {
+            return false;
+        }
+        return true;
+    });
+}
+
+function findMinimalScaleForRecipe(recipe, nutritionFilters) {
+    let minFactor = 1;
+    let maxFactor = Infinity;
+
+    for (const { field, min, max } of nutritionFilters) {
+        const rawValue = Number(recipe[field]);
+        const hasValue = Number.isFinite(rawValue);
+
+        if (min > 0) {
+            if (!hasValue || rawValue <= 0) {
+                return null;
+            }
+            minFactor = Math.max(minFactor, min / rawValue);
+        }
+
+        if (max < Infinity && hasValue && rawValue > 0) {
+            maxFactor = Math.min(maxFactor, max / rawValue);
+        }
+    }
+
+    if (minFactor > maxFactor) {
+        return null;
+    }
+
+    const candidate = Math.max(1, roundScale(minFactor));
+    if (candidate > maxFactor) {
+        return null;
+    }
+    if (!doesRecipeFitAtScale(recipe, candidate, nutritionFilters)) {
+        return null;
+    }
+
+    return candidate;
+}
+
 function imgHtml(recipe, type) {
     if (isUrl(recipe.image)) {
         return type === 'card'
@@ -371,8 +430,11 @@ function displayRecipes(recipesToDisplay) {
         groupRecipes.forEach(recipe => {
             const card = document.createElement('div');
             card.className = 'recipe-card';
+            const matchedScale = recipeScaleMap.get(recipe.id);
+            const badgeHtml = matchedScale && matchedScale > 1 ? `<span class="scale-badge">${matchedScale}x</span>` : '';
 
             card.innerHTML = `
+                ${badgeHtml}
                 ${imgHtml(recipe, 'card')}
                 <div class="card-bottom">
                     <h3>${recipe.name}</h3>
@@ -416,7 +478,7 @@ function displayRecipes(recipesToDisplay) {
                 deleteRecipe(recipe);
             });
 
-            card.addEventListener('click', () => showRecipeDetail(recipe));
+            card.addEventListener('click', () => showRecipeDetail(recipe, matchedScale || 1));
 
             grid.appendChild(card);
         });
@@ -556,7 +618,7 @@ function setRecipeDetailScale(scale) {
 
     const input = document.getElementById('scale-factor-input');
     if (input) {
-        input.value = formatScaledQuantity(scale);
+        input.value = formatScaleInputValue(scale);
     }
 
     const caloriesValue = document.getElementById('recipe-calories-value');
@@ -574,11 +636,11 @@ function setRecipeDetailScale(scale) {
     }
 }
 
-function showRecipeDetail(recipe) {
+function showRecipeDetail(recipe, initialScale = 1) {
     const content = document.getElementById('recipe-detail-content');
     const normalizedIngredients = normalizeIngredientLines(recipe);
     detailOriginalIngredients = normalizedIngredients;
-    detailCurrentScale = 1;
+    detailCurrentScale = initialScale;
 
     detailOriginalNutrition = {
         calories: Number(recipe.calories),
@@ -593,7 +655,7 @@ function showRecipeDetail(recipe) {
                 <span class="detail-scaling-label">Portionen</span>
                 <div class="portion-control">
                     <button id="scale-decrease" type="button">−</button>
-                    <input id="scale-factor-input" type="number" min="0.1" step="0.1" value="1" />
+                    <input id="scale-factor-input" type="number" min="0.25" step="0.25" value="${formatScaleInputValue(initialScale)}" />
                     <button id="scale-increase" type="button">+</button>
                 </div>
             </div>
@@ -601,15 +663,15 @@ function showRecipeDetail(recipe) {
         </div>
         <p class="detail-description">${recipe.description}</p>
         <div class="detail-meta">
-            <span><strong id="recipe-calories-value">${Number.isFinite(detailOriginalNutrition.calories) ? formatScaledQuantity(detailOriginalNutrition.calories) : recipe.calories}</strong> kcal</span>
-            <span><strong id="recipe-protein-value">${Number.isFinite(detailOriginalNutrition.protein) ? formatScaledQuantity(detailOriginalNutrition.protein) : recipe.protein}</strong>g Protein</span>
+            <span><strong id="recipe-calories-value">${Number.isFinite(detailOriginalNutrition.calories) ? formatScaledQuantity(detailOriginalNutrition.calories * detailCurrentScale) : recipe.calories}</strong> kcal</span>
+            <span><strong id="recipe-protein-value">${Number.isFinite(detailOriginalNutrition.protein) ? formatScaledQuantity(detailOriginalNutrition.protein * detailCurrentScale) : recipe.protein}</strong>g Protein</span>
             <span>${recipe.category}</span>
             <span>${Array.isArray(recipe.meal) ? recipe.meal.join(', ') : recipe.meal}</span>
             <span>${recipe.size}</span>
         </div>
         <h4>Zutaten</h4>
         <ul id="recipe-ingredients-list">
-            ${normalizedIngredients.map((ingredient) => `<li>${scaleIngredientLine(ingredient, 1)}</li>`).join('')}
+            ${normalizedIngredients.map((ingredient) => `<li>${scaleIngredientLine(ingredient, detailCurrentScale)}</li>`).join('')}
         </ul>
         <h4>Zubereitung</h4>
         <p>${recipe.instructions}</p>
@@ -632,14 +694,15 @@ function showRecipeDetail(recipe) {
 
     if (decreaseButton) {
         decreaseButton.addEventListener('click', () => {
-            const next = Math.max(0.1, detailCurrentScale - 0.5);
+            const next = Math.max(0.25, Number((detailCurrentScale - 0.25).toFixed(2)));
             setRecipeDetailScale(next);
         });
     }
 
     if (increaseButton) {
         increaseButton.addEventListener('click', () => {
-            setRecipeDetailScale(detailCurrentScale + 0.5);
+            const next = Number((detailCurrentScale + 0.25).toFixed(2));
+            setRecipeDetailScale(next);
         });
     }
 
@@ -650,7 +713,7 @@ function showRecipeDetail(recipe) {
                 scaleInput.value = formatScaleInputValue(detailCurrentScale);
                 return;
             }
-            setRecipeDetailScale(factor);
+            setRecipeDetailScale(roundScale(factor));
         });
         scaleInput.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') {
@@ -659,6 +722,7 @@ function showRecipeDetail(recipe) {
         });
     }
 
+    setRecipeDetailScale(detailCurrentScale);
     document.getElementById('recipe-detail-overlay').style.display = 'flex';
 }
 document.getElementById('close-detail').addEventListener('click', () => {
@@ -729,9 +793,14 @@ function applyFilters() {
         .map(i => i.trim())
         .filter(i => i);
 
-    filteredRecipes = recipes.filter(recipe => {
+    const nutritionFilters = [
+        { field: 'calories', min: minCalories, max: maxCalories },
+        { field: 'protein', min: minProtein, max: maxProtein }
+    ];
 
-        // 🔥 SEARCH bleibt erhalten
+    recipeScaleMap.clear();
+
+    filteredRecipes = recipes.filter(recipe => {
         const recipeIngredients = Array.isArray(recipe.ingredients)
             ? recipe.ingredients
             : (typeof recipe.ingredients === 'string' ? recipe.ingredients.split(',').map(i => i.trim()) : []);
@@ -742,15 +811,14 @@ function applyFilters() {
             recipe.description.toLowerCase().includes(query) ||
             recipeIngredients.some(ing => ing.toLowerCase().includes(query));
 
-        const caloriesValue = Number(recipe.calories) || 0;
-        const proteinValue = Number(recipe.protein) || 0;
+        const matchedScale = findMinimalScaleForRecipe(recipe, nutritionFilters);
+        if (!matchedScale) {
+            return false;
+        }
+        recipeScaleMap.set(recipe.id, matchedScale);
 
         return (
             matchesSearch &&
-            caloriesValue >= minCalories &&
-            caloriesValue <= maxCalories &&
-            proteinValue >= minProtein &&
-            proteinValue <= maxProtein &&
             (selectedCategories.length === 0 || selectedCategories.includes(recipe.category)) &&
             (selectedMeals.length === 0 || selectedMeals.includes(recipe.meal)) &&
             (selectedSizes.length === 0 || selectedSizes.includes(recipe.size)) &&
