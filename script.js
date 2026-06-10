@@ -1191,18 +1191,38 @@ function parseRecipeTextLocally(text, scale = 1) {
         .map(cleanIngredientLine)
         .map(line => scaleIngredientLine(line, scale))
         .filter(Boolean);
-    const instructions = sections.instructions.map(cleanInstructionLine).filter(Boolean);
+    const rawInstructions = sections.instructions.map(cleanInstructionLine).filter(Boolean);
+    const instructions = numberInstructions(rawInstructions);
 
-    if (!ingredients.length && !instructions.length && calories == null && protein == null) {
+    if (!ingredients.length && !rawInstructions.length && calories == null && protein == null) {
         return null;
     }
 
     return {
         ingredients: [...new Set(ingredients)],
-        instructions: instructions.join('\n'),
+        instructions,
         calories: calories != null ? Math.round(calories * scale) : null,
         protein: protein != null ? Number((protein * scale).toFixed(1)) : null
     };
+}
+
+function numberInstructions(lines) {
+    const sentences = lines.flatMap(line => splitInstructionSentences(line));
+    return sentences
+        .map((sentence, index) => `${index + 1}. ${sentence.replace(/^\d+\.\s*/, '').trim()}`)
+        .join('\n');
+}
+
+function splitInstructionSentences(line) {
+    const normalized = line.replace(/\s+/g, ' ').trim();
+    if (!normalized) {
+        return [];
+    }
+
+    const parts = normalized.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜẞ0-9])/g);
+    return parts
+        .map(part => part.trim())
+        .filter(Boolean);
 }
 
 function scaleIngredientLine(line, scale) {
