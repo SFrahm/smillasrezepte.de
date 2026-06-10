@@ -515,7 +515,7 @@ function parseIngredientLine(line) {
         'tasse', 'tassen'
     ].join('|');
 
-    const regex = new RegExp(`^\\s*((?:\\d+(?:[.,]\\d+)?(?:\\s+\\d+\\/\\d+)?|\\d+\\/\\d+))\\s*((?:${units}))?\\b(.*)$`, 'i');
+    const regex = new RegExp(`^\\s*((?:\\d+(?:[.,]\\d+)?(?:\\s+\\d+\\/\\d+)?|\\d+\\/\\d+))\\s*(?:(${units})(?![A-Za-zÄÖÜäöüß]))?\\s*(.*)$`, 'i');
     const match = line.match(regex);
 
     if (!match) {
