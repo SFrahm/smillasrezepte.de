@@ -68,7 +68,6 @@ function deleteRecipe(recipe) {
     }
 
     displayRecipes(filteredRecipes);
-    saveBackup();
 }
 function restoreRecipe(recipe) {
     if (!firebase.auth().currentUser) {
@@ -102,7 +101,6 @@ function restoreRecipe(recipe) {
 
     displayRecipes(filteredRecipes);
     displayTrash();
-    saveBackup();
 }
 
 function permanentlyDeleteRecipe(id) {
@@ -463,7 +461,6 @@ function displayRecipes(recipesToDisplay) {
 
                 saveToLocalStorage();
                 db.ref('recipes').set(recipes);
-                saveBackup();
 
                 displayRecipes(filteredRecipes);
             });
@@ -1543,7 +1540,6 @@ async function saveRecipe() {
 
         console.error(e);
     }
-    saveBackup();
 }
 
 function openRecipeForm(recipe = null) {
@@ -1789,6 +1785,16 @@ function openLogout() {
 
 document.getElementById("logout-btn").addEventListener("click", openLogout);
 
+document.getElementById("backup-recipes").addEventListener("click", async () => {
+    if (!firebase.auth().currentUser) {
+        alert("Bitte einloggen!");
+        return;
+    }
+
+    await saveBackup();
+    alert("Backup wurde erstellt.");
+});
+
 document.getElementById("logout-confirm").addEventListener("click", () => {
     firebase.auth().signOut();
     document.getElementById("logout-overlay").style.display = "none";
@@ -1865,11 +1871,34 @@ document.getElementById('favorites-btn').addEventListener('click', () => {
 });
 
 
-function saveBackup() {
-    db.ref('backups/' + Date.now()).set({
+async function saveBackup() {
+    const backupKey = Date.now();
+    await db.ref('backups/' + backupKey).set({
         recipes: recipes,
-        timestamp: Date.now()
+        timestamp: backupKey
     });
+
+    await cleanupOldBackups();
+}
+
+async function cleanupOldBackups() {
+    const snap = await db.ref('backups').orderByKey().get();
+    if (!snap.exists()) return;
+
+    const keys = [];
+    snap.forEach(child => {
+        keys.push(child.key);
+    });
+
+    if (keys.length <= 10) return;
+
+    const removeCount = keys.length - 10;
+    const updates = {};
+    keys.slice(0, removeCount).forEach(key => {
+        updates[`backups/${key}`] = null;
+    });
+
+    await db.ref().update(updates);
 }
 
 async function restoreLatestBackup() {
