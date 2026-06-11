@@ -5,6 +5,23 @@ body {
     background: radial-gradient(ellipse at top, #0d1f22 0%, #121212 60%);
     min-height: 100vh;
     color: #ffffff;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+        "header header"
+        "search search"
+        "filter recipes";
+    grid-template-rows: auto auto 1fr;
+}
+
+@media (max-width: 1023px) {
+    body {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "header"
+            "search"
+            "recipes";
+    }
 }
 
 header {
@@ -14,17 +31,17 @@ header {
     text-align: center;
     box-shadow: 0 4px 20px rgba(0, 188, 212, 0.35), 0 2px 6px rgba(0,0,0,0.4);
     text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    grid-area: header;
 }
 .search-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-
     justify-content: center;
     align-items: center;
-
     margin: 20px;
     gap: 10px;
+    grid-area: search;
 }
 #search-input {
     width: 60%;
@@ -49,6 +66,12 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media (min-width: 1024px) {
+    #filter-btn {
+        display: none;
+    }
 }
 
 #add-recipe-btn {
@@ -81,6 +104,29 @@ header {
     align-items: center;
 }
 
+@media (min-width: 1024px) {
+    #filter-overlay {
+        display: block;
+        position: static;
+        inset: auto;
+        padding: 20px 12px;
+        box-sizing: border-box;
+        background-color: transparent;
+        z-index: auto;
+        grid-area: filter;
+        height: auto;
+        overflow-y: auto;
+        min-width: 280px;
+    }
+    
+    #filter-overlay.active {
+        display: block;
+        position: static;
+        justify-content: unset;
+        align-items: unset;
+    }
+}
+
 #filter-popup {
     width: 100%;
     max-width: 360px;
@@ -96,9 +142,33 @@ header {
         0 32px 80px rgba(0,0,0,0.65),
         0 8px 24px rgba(0,0,0,0.4),
         inset 0 1px 0 rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
 }
 #filter-popup.active {
     display: flex;
+}
+
+@media (min-width: 1024px) {
+    #filter-popup {
+        width: 260px;
+        max-width: none;
+        max-height: none;
+        overflow-y: auto;
+        background: linear-gradient(160deg, #242424 0%, #1a1a1a 100%);
+        border: 1px solid rgba(0, 188, 212, 0.15);
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow:
+            0 8px 24px rgba(0,0,0,0.4),
+            inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    
+    #filter-popup .popup-actions,
+    #filter-popup #apply-filters,
+    #filter-popup #close-filter {
+        display: none !important;
+    }
 }
 
 #filter-popup .filter-header {
@@ -110,11 +180,24 @@ header {
     margin-bottom: 18px;
 }
 
+@media (min-width: 1024px) {
+    #filter-popup .filter-header {
+        margin-bottom: 14px;
+    }
+}
+
 #filter-popup h3 {
     margin: 0;
     font-size: 24px;
     color: #00d6f7;
     letter-spacing: 0.02em;
+}
+
+@media (min-width: 1024px) {
+    #filter-popup h3 {
+        font-size: 18px;
+        margin: 0 0 12px 0;
+    }
 }
 
 .filter-reset-btn {
@@ -157,6 +240,14 @@ header {
     font-family: 'Georgia', serif;
 }
 
+@media (min-width: 1024px) {
+    #filter-popup .filter-section > label {
+        margin-bottom: 8px;
+        font-size: 14px;
+        gap: 8px;
+    }
+}
+
 /* Accordion komplett isoliert */
 #filter-popup .accordion-content label {
     display: flex;
@@ -175,6 +266,13 @@ header {
     margin: 0;
 }
 
+@media (min-width: 1024px) {
+    #filter-popup input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+    }
+}
+
 #filter-popup input[type="number"],
 #filter-popup input[type="text"] {
     width: 100%;
@@ -185,6 +283,16 @@ header {
     background-color: #292929;
     color: #ffffff;
     box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+    #filter-popup input[type="number"],
+    #filter-popup input[type="text"] {
+        padding: 8px 10px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        border-radius: 10px;
+    }
 }
 
 #filter-popup .filter-section {
@@ -199,12 +307,26 @@ header {
     margin-bottom: 0;
 }
 
+@media (min-width: 1024px) {
+    #filter-popup .filter-section {
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+    }
+}
+
 #filter-popup h4 {
     margin: 0 0 12px 0;
     font-size: 13px;
     color: #00d6f7;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+@media (min-width: 1024px) {
+    #filter-popup h4 {
+        font-size: 11px;
+        margin: 0 0 8px 0;
+    }
 }
 
 #filter-popup .popup-actions {
@@ -224,6 +346,15 @@ header {
     flex: none;
     width: auto;
     min-width: 0;
+}
+
+@media (min-width: 1024px) {
+    #filter-popup .filter-header .filter-reset-btn {
+        width: auto;
+        height: 32px;
+        padding: 4px 8px;
+        font-size: 16px;
+    }
 }
 
 #ingredients-input {
@@ -367,6 +498,14 @@ header {
 
 #recipe-list {
     padding: 20px;
+    grid-area: recipes;
+    overflow-y: auto;
+}
+
+@media (min-width: 1024px) {
+    #recipe-list {
+        max-height: calc(100vh - 140px);
+    }
 }
 
 #favorites-btn {
@@ -1315,6 +1454,14 @@ input:focus, select:focus, textarea:focus {
 .accordion-group {
     border-radius: 10px;
     overflow: hidden;
+    margin-bottom: 8px;
+}
+
+@media (min-width: 1024px) {
+    .accordion-group {
+        border-radius: 8px;
+        margin-bottom: 6px;
+    }
 }
 
 /* HEADER */
@@ -1325,10 +1472,18 @@ input:focus, select:focus, textarea:focus {
     cursor: pointer;
     font-weight: bold;
     transition: 0.2s;
+    font-size: 15px;
 }
 
 .accordion-header:hover {
     background: #3a3a3a;
+}
+
+@media (min-width: 1024px) {
+    .accordion-header {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
 }
 
 /* CONTENT WRAPPER */
@@ -1342,6 +1497,13 @@ input:focus, select:focus, textarea:focus {
 
 .accordion-content.open {
     display: flex;
+}
+
+@media (min-width: 1024px) {
+    .accordion-content {
+        gap: 3px;
+        padding: 8px 10px;
+    }
 }
 
 /* =========================
@@ -1378,6 +1540,15 @@ input:focus, select:focus, textarea:focus {
     color: #ddd;
 
     transition: 0.15s;
+    font-size: 14px;
+}
+
+@media (min-width: 1024px) {
+    .accordion-content label span {
+        padding: 6px 8px;
+        font-size: 13px;
+        border-radius: 6px;
+    }
 }
 
 /* hover */
@@ -1427,6 +1598,12 @@ input:focus, select:focus, textarea:focus {
 
 .meal-grid .recipe-card {
     width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .meal-grid {
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {

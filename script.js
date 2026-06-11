@@ -750,7 +750,8 @@ document.getElementById('reset-filters').addEventListener('click', resetFilters)
 document.getElementById('close-filter').addEventListener('click', closeFilter);
 
 document.getElementById('filter-overlay').addEventListener('click', (event) => {
-    if (event.target.id === 'filter-overlay') {
+    // Nur auf Mobile schließen (unter 1024px)
+    if (event.target.id === 'filter-overlay' && window.innerWidth < 1024) {
         closeFilter();
     }
 });
@@ -827,8 +828,10 @@ function applyFilters() {
 
     displayRecipes(filteredRecipes);
 
-    // Overlay sauber schließen
-    closeFilter();
+    // Nur auf Mobile Overlay schließen (unter 1024px)
+    if (window.innerWidth < 1024) {
+        closeFilter();
+    }
 }
 document.getElementById('add-recipe-btn').addEventListener('click', () => openRecipeForm());
 
@@ -1768,6 +1771,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (cb !== input) cb.checked = false;
                 });
         }
+    });
+
+    // =========================
+    // Event-Listener für Live-Filter
+    // =========================
+    // Input-Felder (Nährwertfilter, Zutaten)
+    const filterInputs = document.querySelectorAll(
+        '#min-calories, #max-calories, #min-protein, #max-protein, #ingredients-input'
+    );
+    filterInputs.forEach(input => {
+        input.addEventListener('input', applyFilters);
+    });
+
+    // Checkboxes (Kategorien, Mahlzeiten, Größen)
+    const filterCheckboxes = document.querySelectorAll(
+        '.category-filter, .meal-filter, .size-filter'
+    );
+    filterCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', applyFilters);
     });
 
 });
