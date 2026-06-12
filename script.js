@@ -431,21 +431,32 @@ function displayRecipes(recipesToDisplay) {
             const matchedScale = recipeScaleMap.get(recipe.id);
             const badgeHtml = matchedScale && matchedScale > 1 ? `<span class="scale-badge">${matchedScale}x</span>` : '';
 
+            const caloriesText = Number.isFinite(recipe.calories) ? `${recipe.calories} kcal` : '– kcal';
+            const proteinText = Number.isFinite(recipe.protein) ? `${recipe.protein} g Protein` : '– g Protein';
+
             card.innerHTML = `
                 ${badgeHtml}
                 ${imgHtml(recipe, 'card')}
                 <div class="card-bottom">
-                    <h3>${recipe.name}</h3>
-
-                    <div class="card-actions">
-
-                        <button class="favorite-btn" title="Favorit">
-                            ${recipe.favorite ? "❤️" : "🤍"}
-                        </button>
-
-                        <button class="edit-btn" title="Bearbeiten">✏️</button>
-                        <button class="delete-btn" title="Löschen">🗑️</button>
-
+                    <div class="card-title-actions">
+                        <h3>${recipe.name}</h3>
+                        <div class="card-actions">
+                            <button class="favorite-btn" title="Favorit">
+                                ${recipe.favorite ? "❤️" : "🤍"}
+                            </button>
+                            <button class="edit-btn" title="Bearbeiten">✏️</button>
+                            <button class="delete-btn" title="Löschen">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="card-nutrition">
+                        <div class="nutrition-item">
+                            
+                            <strong>${caloriesText}</strong>
+                        </div>
+                        <div class="nutrition-item">
+                        
+                            <strong>${proteinText}</strong>
+                        </div>
                     </div>
                 </div>
             `;
@@ -731,7 +742,25 @@ document.getElementById('recipe-detail-overlay').addEventListener('click', (even
     }
 });
 
-document.getElementById('search-input').addEventListener('input', filterRecipes);
+document.getElementById('search-input').addEventListener('input', function() {
+    const clearBtn = document.getElementById('clear-search-btn');
+    if (this.value.length > 0) {
+        clearBtn.classList.add('visible');
+    } else {
+        clearBtn.classList.remove('visible');
+    }
+    filterRecipes();
+});
+
+document.getElementById('clear-search-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const searchInput = document.getElementById('search-input');
+    searchInput.value = '';
+    this.classList.remove('visible');
+    filterRecipes();
+    searchInput.focus();
+});
 
 document.getElementById('filter-btn').addEventListener('click', () => {
     const overlay = document.getElementById('filter-overlay');
@@ -761,7 +790,6 @@ function resetFilters() {
     document.getElementById('max-calories').value = '';
     document.getElementById('min-protein').value = '';
     document.getElementById('max-protein').value = '';
-    document.getElementById('ingredients-input').value = '';
     document.querySelectorAll('#filter-popup input[type="checkbox"]').forEach(cb => cb.checked = false);
     applyFilters();
 }
@@ -784,12 +812,6 @@ function applyFilters() {
     const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.value);
     const selectedMeals = Array.from(document.querySelectorAll('.meal-filter:checked')).map(cb => cb.value);
     const selectedSizes = Array.from(document.querySelectorAll('.size-filter:checked')).map(cb => cb.value);
-
-    const ingredients = document.getElementById('ingredients-input').value
-        .toLowerCase()
-        .split(',')
-        .map(i => i.trim())
-        .filter(i => i);
 
     const nutritionFilters = [
         { field: 'calories', min: minCalories, max: maxCalories },
@@ -819,10 +841,7 @@ function applyFilters() {
             matchesSearch &&
             (selectedCategories.length === 0 || selectedCategories.includes(recipe.category)) &&
             (selectedMeals.length === 0 || selectedMeals.includes(recipe.meal)) &&
-            (selectedSizes.length === 0 || selectedSizes.includes(recipe.size)) &&
-            (ingredients.length === 0 || ingredients.every(ing =>
-                recipe.tags.some(tag => tag.toLowerCase().includes(ing))
-            ))
+            (selectedSizes.length === 0 || selectedSizes.includes(recipe.size))
         );
     });
 
@@ -1461,10 +1480,6 @@ async function saveRecipe() {
 
     const size = document.getElementById('recipe-size').value;
 
-    const tags = document
-        .getElementById('recipe-tags')
-        .value
-        .split(',');
 
     if (
         !name ||
@@ -1498,7 +1513,6 @@ async function saveRecipe() {
         category,
         meal,
         size,
-        tags: tags.map(t => t.trim()).filter(Boolean),
         favorite: existingRecipe ? existingRecipe.favorite : false
     };
 
@@ -1575,7 +1589,6 @@ function fillForm(recipe) {
     document.getElementById('recipe-protein').value = recipe.protein || '';
     document.getElementById('recipe-category').value = recipe.category || 'süß';
     document.getElementById('recipe-size').value = recipe.size || 'klein';
-    document.getElementById('recipe-tags').value = Array.isArray(recipe.tags) ? recipe.tags.join(', ') : (recipe.tags || '');
     document.querySelectorAll('input[name="meal"]').forEach(cb => {
         cb.checked = (recipe.meal === cb.value);
     });
@@ -1619,7 +1632,6 @@ function resetForm() {
     document.getElementById('recipe-protein').value = '';
     document.getElementById('recipe-category').value = 'süß';
     document.getElementById('recipe-size').value = 'klein';
-    document.getElementById('recipe-tags').value = '';
     document.getElementById('recipe-text-input').value = '';
     document.getElementById('recipe-parse-status').textContent = '';
     document.getElementById('recipe-parse-error').textContent = '';
@@ -1776,9 +1788,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================
     // Event-Listener für Live-Filter
     // =========================
-    // Input-Felder (Nährwertfilter, Zutaten)
+    // Input-Felder (Nährwertfilter)
     const filterInputs = document.querySelectorAll(
-        '#min-calories, #max-calories, #min-protein, #max-protein, #ingredients-input'
+        '#min-calories, #max-calories, #min-protein, #max-protein'
     );
     filterInputs.forEach(input => {
         input.addEventListener('input', applyFilters);
