@@ -452,8 +452,8 @@ body {
 
 @media (min-width: 1024px) {
     #filter-popup .filter-header .filter-reset-btn {
-        width: auto;
-        height: 32px;
+        width: 30px;
+        height: 30px;
         padding: 4px 8px;
         font-size: 16px;
     }
