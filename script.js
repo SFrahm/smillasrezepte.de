@@ -620,7 +620,7 @@ function setRecipeDetailScale(scale) {
     const ingredientList = document.getElementById('recipe-ingredients-list');
     if (ingredientList) {
         ingredientList.innerHTML = detailOriginalIngredients
-            .map((ingredient) => `<li>${scaleIngredientLine(ingredient, scale)}</li>`)
+            .map((ingredient) => renderIngredientListItem(ingredient, scale))
             .join('');
     }
 
@@ -642,6 +642,22 @@ function setRecipeDetailScale(scale) {
     if (scaleInput) {
         scaleInput.value = formatScaleInputValue(scale);
     }
+}
+
+function isIngredientHeading(ingredient) {
+    return /^\[.+\]$/.test(String(ingredient).trim());
+}
+
+function formatIngredientHeading(ingredient) {
+    return String(ingredient).trim().replace(/^\[|\]$/g, '');
+}
+
+function renderIngredientListItem(ingredient, scale) {
+    if (isIngredientHeading(ingredient)) {
+        return `<li class="ingredient-heading">${formatIngredientHeading(ingredient)}</li>`;
+    }
+
+    return `<li>${scaleIngredientLine(ingredient, scale)}</li>`;
 }
 
 function showRecipeDetail(recipe, initialScale = 1) {
@@ -679,7 +695,7 @@ function showRecipeDetail(recipe, initialScale = 1) {
         </div>
         <h4>Zutaten</h4>
         <ul id="recipe-ingredients-list">
-            ${normalizedIngredients.map((ingredient) => `<li>${scaleIngredientLine(ingredient, detailCurrentScale)}</li>`).join('')}
+            ${normalizedIngredients.map((ingredient) => renderIngredientListItem(ingredient, detailCurrentScale)).join('')}
         </ul>
         <h4>Zubereitung</h4>
         <p>${recipe.instructions}</p>
@@ -848,10 +864,12 @@ function applyFilters() {
     displayRecipes(filteredRecipes);
 
     // Nur auf Mobile Overlay schließen (unter 1024px)
-    if (window.innerWidth < 1024) {
+    document.getElementById('apply-filters').addEventListener('click', () => {
+        applyFilters();
         closeFilter();
-    }
+    });   
 }
+
 document.getElementById('add-recipe-btn').addEventListener('click', () => openRecipeForm());
 
 document.getElementById('trash-btn').addEventListener('click', displayTrash);
