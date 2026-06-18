@@ -431,8 +431,8 @@ function displayRecipes(recipesToDisplay) {
             const matchedScale = recipeScaleMap.get(recipe.id);
             const badgeHtml = matchedScale && matchedScale > 1 ? `<span class="scale-badge">${matchedScale}x</span>` : '';
 
-            const caloriesText = Number.isFinite(recipe.calories) ? `${recipe.calories} kcal` : '– kcal';
-            const proteinText = Number.isFinite(recipe.protein) ? `${recipe.protein} g Protein` : '– g Protein';
+            const caloriesText = Number.isFinite(recipe.calories) ? `${formatScaledQuantity(recipe.calories * (matchedScale || 1))} kcal` : '– kcal';
+            const proteinText = Number.isFinite(recipe.protein) ? `${formatScaledQuantity(recipe.protein * (matchedScale || 1))} g Protein` : '– g Protein';
 
             card.innerHTML = `
                 ${badgeHtml}
