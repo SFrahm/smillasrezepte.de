@@ -1672,8 +1672,11 @@ input:focus, select:focus, textarea:focus {
     font-size: 15px;
 }
 
-.accordion-header:hover {
+.accordion-header:hover,
+.accordion-header:focus-visible {
     background: #3a3a3a;
+    outline: none;
+    box-shadow: none;
 }
 
 @media (min-width: 1024px) {
@@ -2069,4 +2072,100 @@ body.modal-open {
 
 #recipe-ingredients-list .ingredient-heading:first-child {
     margin-top: 0;
+}
+
+#recipe-ingredients-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.accordion-group {
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    background: #2a2a2a;
+}
+
+@media (min-width: 1024px) {
+    .accordion-group {
+        border-radius: 8px;
+        margin-bottom: 6px;
+    }
+}
+
+.accordion-header {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    background: #2a2a2a;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+    font-size: 15px;
+    text-align: left;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+}
+
+.accordion-header:hover,
+.accordion-header:focus-visible {
+    background: #3a3a3a;
+    outline: none;
+    box-shadow: none;
+}
+
+@media (min-width: 1024px) {
+    .accordion-header {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}
+
+.accordion-content {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px 12px 12px;
+    background: #2a2a2a;
+}
+
+.accordion-content.open {
+    display: flex;
+}
+
+@media (min-width: 1024px) {
+    .accordion-content {
+        gap: 4px;
+        padding: 4px 10px 10px;
+    }
+}
+
+.accordion-item {
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.04);
+    color: #ddd;
+    line-height: 1.8;
+    margin: 0;
+    border-radius: 8px;
+}
+
+.accordion-item + .accordion-item {
+    margin-top: 0;
+}
+
+.ingredient-heading {
+    padding: 0;
+    margin: 0;
+    font-weight: 700;
+    color: #fff;
+    background: transparent;
+}
+
+@media (min-width: 1024px) {
+    .accordion-item {
+        padding: 8px 10px;
+    }
 }

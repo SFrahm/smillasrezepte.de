@@ -617,11 +617,10 @@ function setRecipeDetailScale(scale) {
         return;
     }
     detailCurrentScale = scale;
-    const ingredientList = document.getElementById('recipe-ingredients-list');
-    if (ingredientList) {
-        ingredientList.innerHTML = detailOriginalIngredients
-            .map((ingredient) => renderIngredientListItem(ingredient, scale))
-            .join('');
+    
+    const ingredientAccordion = document.getElementById('recipe-ingredients-accordion');
+    if (ingredientAccordion) {
+        ingredientAccordion.innerHTML = renderIngredientsAsAccordion(detailOriginalIngredients, scale);
     }
 
     const input = document.getElementById('scale-factor-input');
@@ -654,10 +653,77 @@ function formatIngredientHeading(ingredient) {
 
 function renderIngredientListItem(ingredient, scale) {
     if (isIngredientHeading(ingredient)) {
-        return `<li class="ingredient-heading">${formatIngredientHeading(ingredient)}</li>`;
+        return `<div class="ingredient-heading">${formatIngredientHeading(ingredient)}</div>`;
     }
 
-    return `<li>${scaleIngredientLine(ingredient, scale)}</li>`;
+    return `<div class="accordion-item">${scaleIngredientLine(ingredient, scale)}</div>`;
+}
+
+function groupIngredientsByHeadings(ingredients) {
+    const groups = [];
+    let currentGroup = null;
+
+    ingredients.forEach(ingredient => {
+        if (isIngredientHeading(ingredient)) {
+            if (currentGroup && currentGroup.items.length > 0) {
+                groups.push(currentGroup);
+            }
+            currentGroup = {
+                heading: formatIngredientHeading(ingredient),
+                items: []
+            };
+        } else {
+            if (!currentGroup) {
+                currentGroup = {
+                    heading: null,
+                    items: []
+                };
+            }
+            currentGroup.items.push(ingredient);
+        }
+    });
+
+    if (currentGroup && currentGroup.items.length > 0) {
+        groups.push(currentGroup);
+    }
+
+    return groups;
+}
+
+function renderIngredientsAsAccordion(ingredients, scale) {
+    const groups = groupIngredientsByHeadings(ingredients);
+    
+    // Wenn nur eine Gruppe ohne Überschrift, einfach normal rendern
+    if (groups.length === 1 && groups[0].heading === null) {
+        return groups[0].items
+            .map((ingredient) => renderIngredientListItem(ingredient, scale))
+            .join('');
+    }
+
+    // Mit Überschriften: als Accordion rendern
+    return groups.map((group, index) => {
+        if (group.heading === null) {
+            // Zutaten ohne Überschrift einfach rendern
+            return group.items
+                .map((ingredient) => renderIngredientListItem(ingredient, scale))
+                .join('');
+        }
+
+        const itemsHtml = group.items
+            .map((ingredient) => renderIngredientListItem(ingredient, scale))
+            .join('');
+
+        return `
+            <div class="accordion-group">
+                <button class="accordion-header" type="button">
+                    ${group.heading}
+                </button>
+                <div class="accordion-content">
+                    ${itemsHtml}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function showRecipeDetail(recipe, initialScale = 1) {
@@ -694,9 +760,9 @@ function showRecipeDetail(recipe, initialScale = 1) {
             <span>${recipe.size}</span>
         </div>
         <h4>Zutaten</h4>
-        <ul id="recipe-ingredients-list">
-            ${normalizedIngredients.map((ingredient) => renderIngredientListItem(ingredient, detailCurrentScale)).join('')}
-        </ul>
+        <div id="recipe-ingredients-accordion" class="accordion-container">
+            ${renderIngredientsAsAccordion(normalizedIngredients, detailCurrentScale)}
+        </div>
         <h4>Zubereitung</h4>
         <p>${recipe.instructions}</p>
     `;
