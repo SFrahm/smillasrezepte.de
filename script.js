@@ -749,7 +749,7 @@ function showRecipeDetail(recipe, initialScale = 1) {
                     <button id="scale-increase" type="button">+</button>
                 </div>
             </div>
-            <button id="detail-edit-btn" class="edit-btn" type="button">Bearbeiten</button>
+            <button id="detail-edit-btn" class="edit-btn" type="button">✏️</button>
         </div>
         <p class="detail-description">${recipe.description}</p>
         <div class="detail-meta">

@@ -454,7 +454,7 @@ body {
     #filter-popup .filter-header .filter-reset-btn {
         width: 30px;
         height: 30px;
-        padding: 4px 8px;
+        padding: 0;
         font-size: 16px;
     }
 }
