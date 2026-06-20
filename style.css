@@ -446,8 +446,8 @@ body {
 
 #filter-popup .filter-header .filter-reset-btn {
     flex: none;
-    width: auto;
-    min-width: 0;
+    width: 36px;
+    min-width: 36px;
 }
 
 @media (min-width: 1024px) {
