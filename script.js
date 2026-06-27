@@ -856,6 +856,21 @@ document.getElementById('filter-btn').addEventListener('click', () => {
 
 document.getElementById('apply-filters').addEventListener('click', applyFilters);
 
+document.getElementById('random-recipe-btn').addEventListener('click', () => {
+    const availableRecipes = recipes.filter(recipe => recipe.category !== 'Brote & Sauerteigstuff');
+
+    if (!availableRecipes.length) {
+        alert('Kein Rezept gefunden.');
+        return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableRecipes.length);
+    const randomRecipe = availableRecipes[randomIndex];
+
+    closeFilter();
+    showRecipeDetail(randomRecipe, 1);
+});
+
 document.getElementById('reset-filters').addEventListener('click', resetFilters);
 
 document.getElementById('close-filter').addEventListener('click', closeFilter);

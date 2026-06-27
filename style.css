@@ -265,6 +265,12 @@ body {
     margin-bottom: 18px;
 }
 
+.filter-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
 @media (min-width: 1024px) {
     #filter-popup .filter-header {
         margin-bottom: 14px;
@@ -316,6 +322,11 @@ body {
         box-shadow 0.15s ease;
 }
 
+.filter-random-btn {
+    background: transparent;
+    border-color: #00d6f7;
+}
+
 .filter-reset-btn:hover,
 .filter-reset-btn:focus-visible {
     color: #ff5555;
@@ -324,6 +335,28 @@ body {
     box-shadow: 0 0 0 3px rgba(255, 85, 85, 0.12);
     transform: none;
     outline: none;
+}
+
+.filter-random-btn:hover,
+.filter-random-btn:focus-visible {
+    color: #ff5555;
+    background: rgba(0, 188, 212, 0.12);
+    border-color: #00d6f7;
+    box-shadow:
+        0 8px 18px rgba(0, 188, 212, 0.4),
+        0 3px 6px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.filter-random-btn:active {
+    background: rgba(0, 188, 212, 0.18);
+    border-color: #00d6f7;
+    box-shadow:
+        0 2px 4px rgba(0, 188, 212, 0.2),
+        inset 0 2px 5px rgba(0, 0, 0, 0.25);
+    transform: translateY(1px);
 }
 
 .filter-reset-btn:active {
@@ -1794,10 +1827,12 @@ input:focus, select:focus, textarea:focus {
     gap: 20px;
     width: 100%;
     align-items: start;
+    justify-content: start;
 }
 
 .meal-grid .recipe-card {
     width: 100%;
+    max-width: 360px;
 }
 
 @media (min-width: 1024px) {
