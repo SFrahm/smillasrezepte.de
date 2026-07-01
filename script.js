@@ -50,22 +50,8 @@ function deleteRecipe(recipe) {
 
     trash.push({ ...recipe, deletedAt: Date.now() });
 
-    saveToLocalStorage();
     saveTrash();
-
-    try {
-        db.ref('recipes').set(recipes)
-            .then(() => {
-                console.log("Rezepte aktualisiert");
-            })
-            .catch((err) => {
-                console.error(err);
-                alert(err.message);
-            });
-
-    } catch(e) {
-        console.error(e);
-    }
+    persistRecipes();
 
     displayRecipes(filteredRecipes);
 }
@@ -82,22 +68,8 @@ function restoreRecipe(recipe) {
     recipes.push(clean);
     filteredRecipes = [...recipes];
 
-    saveToLocalStorage();
     saveTrash();
-
-    try {
-        db.ref('recipes').set(recipes)
-            .then(() => {
-                console.log("Rezepte wiederhergestellt");
-            })
-            .catch((err) => {
-                console.error(err);
-                alert(err.message);
-            });
-
-    } catch(e) {
-        console.error(e);
-    }
+    persistRecipes();
 
     displayRecipes(filteredRecipes);
     displayTrash();
@@ -1546,6 +1518,23 @@ function extractNumber(text, regex) {
     return match ? Number(match[1].replace(',', '.')) : null;
 }
 
+async function persistRecipes() {
+    saveToLocalStorage();
+
+    if (!firebase.auth().currentUser) {
+        return;
+    }
+
+    try {
+        await db.ref('recipes').set(recipes);
+        await saveBackup();
+        console.log("Rezepte gespeichert");
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
+}
+
 async function saveRecipe() {
 
     if (!firebase.auth().currentUser) {
@@ -1639,23 +1628,7 @@ async function saveRecipe() {
 
     resetForm();
 
-    saveToLocalStorage();
-
-    try {
-
-        db.ref('recipes').set(recipes)
-            .then(() => {
-                console.log("Rezepte gespeichert");
-            })
-            .catch((err) => {
-                console.error(err);
-                alert(err.message);
-            });
-
-    } catch (e) {
-
-        console.error(e);
-    }
+    await persistRecipes();
 }
 
 function openRecipeForm(recipe = null) {
