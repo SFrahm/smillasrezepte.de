@@ -1823,11 +1823,12 @@ input:focus, select:focus, textarea:focus {
 }
 .meal-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
     gap: 20px;
     width: 100%;
     align-items: start;
     justify-content: start;
+    justify-items: start;
 }
 
 .meal-grid .recipe-card {
@@ -1837,7 +1838,7 @@ input:focus, select:focus, textarea:focus {
 
 @media (min-width: 1024px) {
     .meal-grid {
-        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(320px, 360px));
     }
 }
 

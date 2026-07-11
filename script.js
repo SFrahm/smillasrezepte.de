@@ -869,9 +869,20 @@ function closeFilter() {
 
 function filterRecipes() {
     applyFilters();
-} 
+}
+
+function parseSearchTerms(rawQuery) {
+    return rawQuery
+        .split(',')
+        .map(term => term.trim().toLowerCase())
+        .filter(Boolean);
+}
+
 function applyFilters() {
-    const query = document.getElementById('search-input').value.toLowerCase();
+    const rawQuery = document.getElementById('search-input').value.trim();
+    const isIngredientSearch = rawQuery.includes(',');
+    const searchTerms = isIngredientSearch ? parseSearchTerms(rawQuery) : [];
+    const singleSearchTerm = isIngredientSearch ? '' : rawQuery.toLowerCase();
 
     const minCalories = parseInt(document.getElementById('min-calories').value) || 0;
     const maxCalories = parseInt(document.getElementById('max-calories').value) || Infinity;
@@ -895,10 +906,14 @@ function applyFilters() {
             : (typeof recipe.ingredients === 'string' ? recipe.ingredients.split(',').map(i => i.trim()) : []);
 
         const matchesSearch =
-            !query ||
-            recipe.name.toLowerCase().includes(query) ||
-            recipe.description.toLowerCase().includes(query) ||
-            recipeIngredients.some(ing => ing.toLowerCase().includes(query));
+            !rawQuery ||
+            (isIngredientSearch
+                ? searchTerms.every(term => recipeIngredients.some(ing => ing.toLowerCase().includes(term)))
+                : (
+                    recipe.name.toLowerCase().includes(singleSearchTerm) ||
+                    recipe.description.toLowerCase().includes(singleSearchTerm) ||
+                    recipeIngredients.some(ing => ing.toLowerCase().includes(singleSearchTerm))
+                ));
 
         const matchedScale = findMinimalScaleForRecipe(recipe, nutritionFilters);
         if (!matchedScale) {
